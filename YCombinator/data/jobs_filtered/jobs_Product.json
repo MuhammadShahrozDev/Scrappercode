@@ -1,0 +1,234 @@
+[
+    {
+        "id": 104625,
+        "title": "Technical Product Manager",
+        "description": " **About David AI**\n\nDavid AI is the first audio data research company. We bring an R&D approach to data–developing datasets with the same rigor AI labs bring to models. Our mission is to bring AI into the real world, and we believe audio is the gateway. Speech is versatile, accessible, and human—it fits naturally into everyday life. As audio AI advances and new use cases emerge, high-quality training data is the bottleneck. This is where David AI comes in.\n\nDavid AI was founded in 2024 by a team of former Scale AI engineers and operators. In less than a year, we've brought on most FAANG companies and AI labs as customers. We recently raised a $50M Series B from Meritech, NVIDIA, Jack Altman (Alt Capital), Amplify Partners, First Round Capital and other Tier 1 investors.\n\nOur team is sharp, humble, ambitious, and tight-knit. We're looking for the best research, engineering, product, and operations minds to join us on our mission to push the frontier of audio AI.\n\n**About our Technical Product Manager team**\n\nOur Technical Product Manager team builds the Data Factory at David AI. We set the strategy for how raw audio becomes high-quality training data, decide what gets built, and own the outcomes: scale, quality, cost, and the experience of our contributors. Working across Operations, Engineering, and Research, we move fluidly across all three to solve some of the most challenging problems at David AI.\n\n**About this role**\n\nDavid AI is hiring a Technical Product Manager to own a core part of our Data Factory, from early prototypes through production scale. Depending on your background and where we need you most, that could cover our contributor marketplace, our Operations infrastructure, a new or scaling business unit, or the systems our ML team relies on. You'll need the operational chops to lead complex efforts, the instinct to automate them, the technical ability to build the first MVP yourself, and the judgment to partner with engineering and research to implement at scale.\n\n**In this role, you will**\n\n- Own the strategy and roadmap for your area of the Data Factory, from 0→1 prototypes through scaled production systems.\n\n- Lead complex operational efforts and design the workflows and automation that let them scale.\n\n- Build the first version yourself—scripts, queries, dashboards, and prototypes—then partner with engineering to implement it at scale.\n\n- Translate the model capabilities our customers care about into concrete workflows, requirements, and project plans.\n\n- Partner with Operations, Engineering, and Research to focus the team on the most important problems and take new systems from idea to deployment.\n\n- Use data to guide decision making, diagnose issues, and measure performance against throughput, quality, and cost.\n\n- Know when to move fast and when to slow down for alignment, with a bias for rapid prototyping.\n\n- Take full-stack accountability across product, operations, engineering, and customers, solving bottlenecks and ensuring delivery.\n\n**Your background looks like**\n\n- Undergraduate degree in Computer Science or another technical / STEM field, or comparable work experience.\n\n- 2-8 years of experience in product, operations, consulting, or startup environments.\n\n- Direct experience as a product manager, technical program manager, founder, or technical operator accountable for outcomes.\n\n- Highly proficient in SQL and able to develop lightweight prototypes end-to-end.\n\n- A track record of building your own tools in operationally complex roles, or of taking a messy business problem from data foundation through analysis to implementation.\n\n- Systems thinker who can spot leverage points and design for scale and durability.\n\n- Strong product intuition, able to work with engineers and researchers to get to the right answer fast.\n\n- High-execution operator: fast, detail-oriented, and uncompromising on quality.\n\n- Collaborative and low-ego, willing to roll up your sleeves.\n\n**Benefits**\n\n- Unlimited PTO.\n\n- Top-notch health, dental, and vision coverage with 100% coverage for most plans.\n\n- FSA & HSA access.\n\n- 401k access.\n\n- Meals 2x daily through DoorDash + snacks and beverages available at the office.\n\n- Unlimited company-sponsored Barry's classes.\n\n",
+        "job_type": "fulltime",
+        "remote": "no",
+        "role": "product",
+        "eng_type": null,
+        "design_type": null,
+        "science_type": null,
+        "recruiting_type": null,
+        "min_experience": 5,
+        "created_at": "2026-08-15T14:17:57.912Z",
+        "skills": [],
+        "has_interview_process": false,
+        "has_salary": true,
+        "has_equity": false,
+        "us_visa_required": "yes",
+        "locations_for_search": [
+            "US",
+            "CA, US",
+            "San Francisco, CA, US",
+            "NY, US",
+            "New York City, NY, US"
+        ],
+        "company_id": 29759,
+        "company_name": "David AI",
+        "company_website": "https://www.withdavid.ai/",
+        "company_description": "Data for audio AI",
+        "company_created_at": "2024-05-11T14:25:37.955Z",
+        "company_hiring_description": "David AI is the first audio data research company. We bring an R&D approach to data–developing datasets with the same rigor AI labs bring to models. Our mission is to bring AI into the real world, and we believe audio is the gateway. Speech is versatile, accessible, and human—it fits naturally into everyday life. As audio AI advances and new use cases emerge, high-quality training data is the bottleneck. This is where David AI comes in.\r\n\r\n\r\n\r\nDavid AI was founded in 2024 by a team of former Scale AI engineers and operators. In less than a year, we’ve brought on most FAANG companies and AI labs as customers. We recently raised a $50M Series B from Meritech, NVIDIA, Jack Altman (Alt Capital), Amplify Partners, First Round Capital and other Tier 1 investors. \r\n\r\n\r\n\r\nOur team is sharp, humble, ambitious, and tight-knit. We’re looking for the best research, engineering, product, and operations minds to join us on our mission to push the frontier of audio AI.",
+        "company_parent_sector": "B2B Software and Services",
+        "company_child_sector": null,
+        "company_team_size": 10,
+        "company_highlight_black": false,
+        "company_highlight_latinx": false,
+        "company_highlight_women": false,
+        "company_waas_stage": "series_a",
+        "company_waas_activity_score": 50,
+        "search_path": "https://www.ycombinator.com/companies/david-ai/jobs/w629Tew-technical-product-manager",
+        "model_type": "JobsCompanyJob",
+        "model_id": 104625,
+        "_tags": [
+            [
+                "yc_staff",
+                "jobs_applicant",
+                "public"
+            ]
+        ],
+        "objectID": "104625",
+        "_highlightResult": {
+            "title": {
+                "value": "Technical Product Manager",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "description": {
+                "value": " **About David AI**\n\nDavid AI is the first audio data research company. We bring an R&D approach to data–developing datasets with the same rigor AI labs bring to models. Our mission is to bring AI into the real world, and we believe audio is the gateway. Speech is versatile, accessible, and human—it fits naturally into everyday life. As audio AI advances and new use cases emerge, high-quality training data is the bottleneck. This is where David AI comes in.\n\nDavid AI was founded in 2024 by a team of former Scale AI engineers and operators. In less than a year, we've brought on most FAANG companies and AI labs as customers. We recently raised a $50M Series B from Meritech, NVIDIA, Jack Altman (Alt Capital), Amplify Partners, First Round Capital and other Tier 1 investors.\n\nOur team is sharp, humble, ambitious, and tight-knit. We're looking for the best research, engineering, product, and operations minds to join us on our mission to push the frontier of audio AI.\n\n**About our Technical Product Manager team**\n\nOur Technical Product Manager team builds the Data Factory at David AI. We set the strategy for how raw audio becomes high-quality training data, decide what gets built, and own the outcomes: scale, quality, cost, and the experience of our contributors. Working across Operations, Engineering, and Research, we move fluidly across all three to solve some of the most challenging problems at David AI.\n\n**About this role**\n\nDavid AI is hiring a Technical Product Manager to own a core part of our Data Factory, from early prototypes through production scale. Depending on your background and where we need you most, that could cover our contributor marketplace, our Operations infrastructure, a new or scaling business unit, or the systems our ML team relies on. You'll need the operational chops to lead complex efforts, the instinct to automate them, the technical ability to build the first MVP yourself, and the judgment to partner with engineering and research to implement at scale.\n\n**In this role, you will**\n\n- Own the strategy and roadmap for your area of the Data Factory, from 0→1 prototypes through scaled production systems.\n\n- Lead complex operational efforts and design the workflows and automation that let them scale.\n\n- Build the first version yourself—scripts, queries, dashboards, and prototypes—then partner with engineering to implement it at scale.\n\n- Translate the model capabilities our customers care about into concrete workflows, requirements, and project plans.\n\n- Partner with Operations, Engineering, and Research to focus the team on the most important problems and take new systems from idea to deployment.\n\n- Use data to guide decision making, diagnose issues, and measure performance against throughput, quality, and cost.\n\n- Know when to move fast and when to slow down for alignment, with a bias for rapid prototyping.\n\n- Take full-stack accountability across product, operations, engineering, and customers, solving bottlenecks and ensuring delivery.\n\n**Your background looks like**\n\n- Undergraduate degree in Computer Science or another technical / STEM field, or comparable work experience.\n\n- 2-8 years of experience in product, operations, consulting, or startup environments.\n\n- Direct experience as a product manager, technical program manager, founder, or technical operator accountable for outcomes.\n\n- Highly proficient in SQL and able to develop lightweight prototypes end-to-end.\n\n- A track record of building your own tools in operationally complex roles, or of taking a messy business problem from data foundation through analysis to implementation.\n\n- Systems thinker who can spot leverage points and design for scale and durability.\n\n- Strong product intuition, able to work with engineers and researchers to get to the right answer fast.\n\n- High-execution operator: fast, detail-oriented, and uncompromising on quality.\n\n- Collaborative and low-ego, willing to roll up your sleeves.\n\n**Benefits**\n\n- Unlimited PTO.\n\n- Top-notch health, dental, and vision coverage with 100% coverage for most plans.\n\n- FSA & HSA access.\n\n- 401k access.\n\n- Meals 2x daily through DoorDash + snacks and beverages available at the office.\n\n- Unlimited company-sponsored Barry's classes.\n\n",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "locations_for_search": [
+                {
+                    "value": "US",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "CA, US",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "San Francisco, CA, US",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "NY, US",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "New York City, NY, US",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                }
+            ],
+            "company_name": {
+                "value": "David AI",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_website": {
+                "value": "https://www.withdavid.ai/",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_description": {
+                "value": "Data for audio AI",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_hiring_description": {
+                "value": "David AI is the first audio data research company. We bring an R&D approach to data–developing datasets with the same rigor AI labs bring to models. Our mission is to bring AI into the real world, and we believe audio is the gateway. Speech is versatile, accessible, and human—it fits naturally into everyday life. As audio AI advances and new use cases emerge, high-quality training data is the bottleneck. This is where David AI comes in.\r\n\r\n\r\n\r\nDavid AI was founded in 2024 by a team of former Scale AI engineers and operators. In less than a year, we’ve brought on most FAANG companies and AI labs as customers. We recently raised a $50M Series B from Meritech, NVIDIA, Jack Altman (Alt Capital), Amplify Partners, First Round Capital and other Tier 1 investors. \r\n\r\n\r\n\r\nOur team is sharp, humble, ambitious, and tight-knit. We’re looking for the best research, engineering, product, and operations minds to join us on our mission to push the frontier of audio AI.",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_parent_sector": {
+                "value": "B2B Software and Services",
+                "matchLevel": "none",
+                "matchedWords": []
+            }
+        }
+    },
+    {
+        "id": 104496,
+        "title": "Mid Product Analyst (Identity & Orchestration)",
+        "description": "### **About Authologic**\n\nAt Authologic, we are revolutionizing identity verification by building the ultimate orchestration platform that aggregates KYC, AML, and digital IDs into a single, seamless API. We eliminate onboarding friction for global businesses, transforming complex verification flows into elegant, secure, and user-friendly digital experiences.\n\n### **About the Role &amp; Your Growth Trajectory**\n\nWe are building a global center of excellence in Digital Identity and KYC—and we are looking for a **Mid Product Analyst** to take ownership of how we integrate, document, and optimize identity products.\n\nYou don't need a decade of Fintech experience, but you do bring a strong analytical foundation, technical fluency, and a sharp eye for product quality. In this role, you will work hand-in-hand with our Head of Product and top domain veterans, taking full responsibility for turning complex provider architectures and market requirements into crystal-clear specifications.\n\nWe operate as an **AI-first team**. We encourage you to use modern AI tools (Claude, LLMs) as a force multiplier—automating repetitive tasks, accelerating research, and drafting documentation so you can focus on high-level problem solving, product strategy, and user experience.\n\n### **What You Will Learn &amp; Do Alongside Our Experts**\n\n* **Master the Identity Domain:** Work closely with our KYC/AML experts to understand global verification methods (e-IDs, biometrics, document checks) and learn how complex integration logic works at scale.\n* **Gather &amp; Structure Requirements:** Collaborate with providers, Sales, and R&amp;D to understand integration needs. You'll take raw inputs, partner API docs, and team discussions, turning them into clear specifications and simple data flows.\n* **Supercharge Productivity with AI:** Use AI tools to digest heavy provider API docs, draft initial specification outlines, and speed up research—leaving you more time to think rather than type.\n* **Keep Docs Fresh &amp; Useful:** Build and maintain internal knowledge bases (Notion) and help refine external API docs so engineers and clients always have clear guidance.\n* **Connect the Dots:** Act as the connective bridge between Product, Tehcnology, and Sales to make sure everyone is aligned on what we're delivering.\n\n### **What We Look For**\n\n* **Identity Touchpoint:** You have had some prior exposure or hands-on contact with Digital Identity, KYC, AML, e-ID, or user verification (e.g., in a support, operations, junior analysis, or tech-adjacent role).\n* **API Familiarity:** You understand what an API is, have a basic grasp of REST/JSON concepts, and aren't afraid to look at technical integration docs.\n* **Strong Business Communication:** You communicate clearly, articulate ideas logically, and feel comfortable talking to both developers and business stakeholders.\n* **Fast Learner &amp; Curious Mind:** You absorb new concepts quickly, ask thoughtful questions, and love figuring out _\"how things work under the hood.\"_\n* **Languages:** Professional fluency in **both English and Polish** is strictly required (min. C1 level for English to work with global provider docs).\n\n### **Nice-to-Have (Not dealbreakers!)**\n\n* Any experience with tools like Postman, SQL, Jira, Notion, or diagramming tools (Miro, Figma, Lucidchart).\n* Prior exposure to a SaaS, Fintech, or startup environment.\n\n### **What We Offer**\n\n* **Base salary** + participation in the Authologic Inc. Employee Stock Option Program.\n* **Remote-first culture** with access to co-working spaces (we’re a remote organization, but we meet occasionally in the office and during our quarterly off-sites).\n* **Direct Mentoring:** Learn directly from founders and domain experts in the KYC/AML orchestration space—zero corporate bureaucracy, 100% mentorship and practical impact.\n\n### **How to Apply**\n\nTell us about your story. Send us your CV along with a short note about your experience or contact with Identity/APIs and why you want to build your expertise in this domain at Authologic.\n\n### **GDPR Clause**\n\n_I hereby consent to the processing of personal data contained in my application to be processed by Authologic Sp. z o.o. I hereby also give consent for personal data included in my CV to be processed for the purposes of any future recruitment process._",
+        "job_type": "fulltime",
+        "remote": "yes",
+        "role": "product",
+        "eng_type": null,
+        "design_type": null,
+        "science_type": null,
+        "recruiting_type": null,
+        "min_experience": 1,
+        "created_at": "2026-08-14T14:40:05.214Z",
+        "skills": [
+            "SQL"
+        ],
+        "has_interview_process": false,
+        "has_salary": true,
+        "has_equity": false,
+        "us_visa_required": "none",
+        "locations_for_search": [
+            "PL",
+            "Masovian Voivodeship, PL",
+            "Warsaw, Masovian Voivodeship, PL"
+        ],
+        "company_id": 23531,
+        "company_name": "Authologic",
+        "company_website": "https://authologic.com",
+        "company_description": "Stripe for online identity verification",
+        "company_created_at": "2020-12-17T19:13:44.137Z",
+        "company_hiring_description": "Authologic.com (YC W21) is a global leader in the full-stack e-ID Hub space. We are supercharging the current OCR/liveness KYC stack by supporting identity wallets, bank IDs, government-issued digital IDs, and more. We are a fast-growing, Series A startup spanning Silicon Valley, the UK, and the EU.",
+        "company_parent_sector": "B2B Software and Services",
+        "company_child_sector": "Engineering, Product and Design",
+        "company_team_size": 33,
+        "company_highlight_black": false,
+        "company_highlight_latinx": false,
+        "company_highlight_women": false,
+        "company_waas_stage": "series_a",
+        "company_waas_activity_score": 32.08,
+        "search_path": "https://www.ycombinator.com/companies/authologic/jobs/mqG4DhE-mid-product-analyst-identity-orchestration",
+        "model_type": "JobsCompanyJob",
+        "model_id": 104496,
+        "_tags": [
+            [
+                "yc_staff",
+                "jobs_applicant",
+                "public"
+            ]
+        ],
+        "objectID": "104496",
+        "_highlightResult": {
+            "title": {
+                "value": "Mid Product Analyst (Identity & Orchestration)",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "description": {
+                "value": "### **About Authologic**\n\nAt Authologic, we are revolutionizing identity verification by building the ultimate orchestration platform that aggregates KYC, AML, and digital IDs into a single, seamless API. We eliminate onboarding friction for global businesses, transforming complex verification flows into elegant, secure, and user-friendly digital experiences.\n\n### **About the Role &amp; Your Growth Trajectory**\n\nWe are building a global center of excellence in Digital Identity and KYC—and we are looking for a **Mid Product Analyst** to take ownership of how we integrate, document, and optimize identity products.\n\nYou don't need a decade of Fintech experience, but you do bring a strong analytical foundation, technical fluency, and a sharp eye for product quality. In this role, you will work hand-in-hand with our Head of Product and top domain veterans, taking full responsibility for turning complex provider architectures and market requirements into crystal-clear specifications.\n\nWe operate as an **AI-first team**. We encourage you to use modern AI tools (Claude, LLMs) as a force multiplier—automating repetitive tasks, accelerating research, and drafting documentation so you can focus on high-level problem solving, product strategy, and user experience.\n\n### **What You Will Learn &amp; Do Alongside Our Experts**\n\n* **Master the Identity Domain:** Work closely with our KYC/AML experts to understand global verification methods (e-IDs, biometrics, document checks) and learn how complex integration logic works at scale.\n* **Gather &amp; Structure Requirements:** Collaborate with providers, Sales, and R&amp;D to understand integration needs. You'll take raw inputs, partner API docs, and team discussions, turning them into clear specifications and simple data flows.\n* **Supercharge Productivity with AI:** Use AI tools to digest heavy provider API docs, draft initial specification outlines, and speed up research—leaving you more time to think rather than type.\n* **Keep Docs Fresh &amp; Useful:** Build and maintain internal knowledge bases (Notion) and help refine external API docs so engineers and clients always have clear guidance.\n* **Connect the Dots:** Act as the connective bridge between Product, Tehcnology, and Sales to make sure everyone is aligned on what we're delivering.\n\n### **What We Look For**\n\n* **Identity Touchpoint:** You have had some prior exposure or hands-on contact with Digital Identity, KYC, AML, e-ID, or user verification (e.g., in a support, operations, junior analysis, or tech-adjacent role).\n* **API Familiarity:** You understand what an API is, have a basic grasp of REST/JSON concepts, and aren't afraid to look at technical integration docs.\n* **Strong Business Communication:** You communicate clearly, articulate ideas logically, and feel comfortable talking to both developers and business stakeholders.\n* **Fast Learner &amp; Curious Mind:** You absorb new concepts quickly, ask thoughtful questions, and love figuring out _\"how things work under the hood.\"_\n* **Languages:** Professional fluency in **both English and Polish** is strictly required (min. C1 level for English to work with global provider docs).\n\n### **Nice-to-Have (Not dealbreakers!)**\n\n* Any experience with tools like Postman, SQL, Jira, Notion, or diagramming tools (Miro, Figma, Lucidchart).\n* Prior exposure to a SaaS, Fintech, or startup environment.\n\n### **What We Offer**\n\n* **Base salary** + participation in the Authologic Inc. Employee Stock Option Program.\n* **Remote-first culture** with access to co-working spaces (we’re a remote organization, but we meet occasionally in the office and during our quarterly off-sites).\n* **Direct Mentoring:** Learn directly from founders and domain experts in the KYC/AML orchestration space—zero corporate bureaucracy, 100% mentorship and practical impact.\n\n### **How to Apply**\n\nTell us about your story. Send us your CV along with a short note about your experience or contact with Identity/APIs and why you want to build your expertise in this domain at Authologic.\n\n### **GDPR Clause**\n\n_I hereby consent to the processing of personal data contained in my application to be processed by Authologic Sp. z o.o. I hereby also give consent for personal data included in my CV to be processed for the purposes of any future recruitment process._",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "skills": [
+                {
+                    "value": "SQL",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                }
+            ],
+            "locations_for_search": [
+                {
+                    "value": "PL",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "Masovian Voivodeship, PL",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "Warsaw, Masovian Voivodeship, PL",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                }
+            ],
+            "company_name": {
+                "value": "Authologic",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_website": {
+                "value": "https://authologic.com",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_description": {
+                "value": "Stripe for online identity verification",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_hiring_description": {
+                "value": "Authologic.com (YC W21) is a global leader in the full-stack e-ID Hub space. We are supercharging the current OCR/liveness KYC stack by supporting identity wallets, bank IDs, government-issued digital IDs, and more. We are a fast-growing, Series A startup spanning Silicon Valley, the UK, and the EU.",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_parent_sector": {
+                "value": "B2B Software and Services",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_child_sector": {
+                "value": "Engineering, Product and Design",
+                "matchLevel": "none",
+                "matchedWords": []
+            }
+        }
+    }
+]

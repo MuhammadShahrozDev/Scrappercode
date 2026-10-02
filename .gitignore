@@ -1,0 +1,29 @@
+# Ignore ALL .env files anywhere in project
+.env
+**/.env
+.env.*
+**/.env.*
+
+# Python cache
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+
+# Mac / VS Code
+.DS_Store
+.vscode/
+
+# Generated files
+*.xlsx
+*.csv
+
+# Generated scraper outputs
+**/output/
+
+YCombinator/yc_profile/
+Wellfound/wellfound_profile/

@@ -1,0 +1,41 @@
+{
+  "company_size_threshold": 50,
+
+  "role_aliases": {
+    "CEO": [
+      "ceo",
+      "chief executive officer",
+      "chief executive",
+      "president",
+      "founder",
+      "co-founder"
+    ],
+
+    "CTO": [
+      "cto",
+      "chief technology officer",
+      "chief technical officer",
+      "head of technology",
+      "head of engineering",
+      "vp of engineering",
+      "vp engineering"
+    ],
+
+    "Chief of Staff": [
+      "chief of staff",
+      "chief staff officer",
+      "head of staff",
+      "director of staff",
+      "vp of staff",
+      "vice president of staff",
+      "staff director"
+    ],
+
+    "Director": [
+      "director",
+      "executive director",
+      "managing director",
+      "associate director"
+    ]
+  }
+}

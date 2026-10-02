@@ -1,0 +1,633 @@
+[
+    {
+        "id": 105318,
+        "title": "Member of Technical Staff: Research",
+        "description": "Zep manages, governs, and serves agent memory at enterprise scale. Enterprises build on Zep to run reliable, personalized agents across the business: millions of Context Graphs, served in under 200ms, inside their own VPCs and cloud deployments. Customers include Samsung, Zscaler, Twin Health, HoneyBook, and NASDAQ 100 and Fortune 500 technology companies. We also build Graphiti, our open-source context graph framework (30K+ GitHub stars).\n\nWhat our customers' agents can reason about depends on the memory we retrieve and the memory we write. You own that loop. You build agents that improve retrieval. You finetune the models that extract memory, and the models that power those agents. You run the experiments and ship the result as production code.\n\nWe're hiring an engineer who builds agents and trains the models they run on.\n\nWe will measure you on whether retrieval and memory quality move, and on what reaches production.\n\nYou'll report to our founder, Daniel (2x founder, engineer, former head of ML at SparkPost), and join a team with pedigree at Scale AI, Dropbox, ActiveCampaign, DroneDeploy, and McKinsey.\n\n## How we work\n\nWe're a small, distributed team that works closely together. We pair on hard problems, review each other's designs, and treat learning as part of the job rather than something that happens after hours. We ask a lot of questions: of customers, of teammates, of our own assumptions. When we find pain, we go fix it.\n\nWe expect the same back: ask questions early, push back when you disagree, and care about the people on the other end of the API.\n\n## What you'll do\n\n* Build agents that improve retrieval: query understanding, ranking, and what to pull into context.\n* Finetune the models that extract, update, and consolidate memory on Zep's domain.\n* Finetune the models that power those agents, so the retrieval loop and the agent get better together.\n* Own the work from dataset creation through experiment design, evaluation, training, and a change that ships to production. Our engineers work the serving path alongside you.\n* Build the eval harnesses that catch regressions in retrieval, memory quality, and agent task completion before a release ships.\n* Write up what you find, including the results that killed an idea, so the rest of engineering can build on it.\n\n## Your first 90 days\n\nIn your first week you pick up an open retrieval or memory-extraction problem and frame it as an experiment. By day 30 an agent or a finetune you built is in the product loop, or you have ruled the approach out and written up why. By day 90 you are three cycles in and the eval harness you built runs on every release.\n\n## What we're looking for\n\n* You have shipped production ranking, retrieval, or query understanding.\n* You've built classical ML into a real product — logistic regression, SVMs, GBTs, single-layer perceptrons.\n* You've shipped finetuned models to production. You know transformer architectures and training workflows, and you work in PyTorch.\n* You have shipped a non-trivial agentic system to production. Not a prototype, not a thin wrapper over a chat-completion API.\n* You have a research methodology: dataset creation and curation, experiment design, and evaluation. You can frame an open problem and design an experiment that answers it.\n* You have built evaluation for retrieval, generation, or agent tasks: gold sets, offline metrics, online tests.\n* You write strong Python, and you have enough production AWS to ship, monitor, and iterate on what you train.\n* You have a Master's in Computer Science or equivalent experience.\n\n## This role is probably NOT a fit if:\n\n* Your shipped work is papers, prototypes, and demos.\n* Your agent work is a wrapper over a chat-completion API, with no eval and no model you trained.\n* You haven't finetuned a model that reached production.\n* You need a research agenda handed to you before you move.",
+        "job_type": "fulltime",
+        "remote": "yes",
+        "role": "eng",
+        "eng_type": [
+            "ml"
+        ],
+        "design_type": null,
+        "science_type": null,
+        "recruiting_type": null,
+        "min_experience": 6,
+        "created_at": "2026-08-18T23:19:28.202Z",
+        "skills": [
+            "LLMs",
+            "AI Agents",
+            "Torch/PyTorch",
+            "Python",
+            "Machine Learning",
+            "Amazon Web Services (AWS)"
+        ],
+        "has_interview_process": true,
+        "has_salary": true,
+        "has_equity": true,
+        "us_visa_required": "yes",
+        "locations_for_search": [
+            "San Francisco, CA, US",
+            "San Francisco",
+            "CA",
+            "US"
+        ],
+        "company_id": 29425,
+        "company_name": "Zep AI",
+        "company_website": "https://www.getzep.com/",
+        "company_description": "Agent Context Is Hard. We Fixed It.",
+        "company_created_at": "2023-11-10T23:07:28.916Z",
+        "company_hiring_description": "Zep is the context engineering platform for AI agents. We solve one of the hardest problems in production AI: getting the right context to agents at the right time. Our platform builds context graphs from conversations and business data, then assembles personalized, token-efficient context with sub-200ms retrieval. Three lines of code to production.\r\n\r\nWe're a seed-stage company (YC W24) with 50% month-over-month ARR growth, 240+ customers including Fortune 500s, and a well-capitalized balance sheet. Graphiti, our open-source temporal context graph engine, has 24,000+ GitHub stars and is becoming foundational infrastructure for agent memory.",
+        "company_parent_sector": "B2B Software and Services",
+        "company_child_sector": null,
+        "company_team_size": 5,
+        "company_highlight_black": false,
+        "company_highlight_latinx": false,
+        "company_highlight_women": false,
+        "company_waas_stage": "seed",
+        "company_waas_activity_score": 50,
+        "search_path": "https://www.ycombinator.com/companies/zep-ai/jobs/8YxqiAO-member-of-technical-staff-research",
+        "model_type": "JobsCompanyJob",
+        "model_id": 105318,
+        "_tags": [
+            [
+                "yc_staff",
+                "jobs_applicant",
+                "public"
+            ]
+        ],
+        "objectID": "105318",
+        "_highlightResult": {
+            "title": {
+                "value": "Member of Technical Staff: Research",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "description": {
+                "value": "Zep manages, governs, and serves agent memory at enterprise scale. Enterprises build on Zep to run reliable, personalized agents across the business: millions of Context Graphs, served in under 200ms, inside their own VPCs and cloud deployments. Customers include Samsung, Zscaler, Twin Health, HoneyBook, and NASDAQ 100 and Fortune 500 technology companies. We also build Graphiti, our open-source context graph framework (30K+ GitHub stars).\n\nWhat our customers' agents can reason about depends on the memory we retrieve and the memory we write. You own that loop. You build agents that improve retrieval. You finetune the models that extract memory, and the models that power those agents. You run the experiments and ship the result as production code.\n\nWe're hiring an engineer who builds agents and trains the models they run on.\n\nWe will measure you on whether retrieval and memory quality move, and on what reaches production.\n\nYou'll report to our founder, Daniel (2x founder, engineer, former head of ML at SparkPost), and join a team with pedigree at Scale AI, Dropbox, ActiveCampaign, DroneDeploy, and McKinsey.\n\n## How we work\n\nWe're a small, distributed team that works closely together. We pair on hard problems, review each other's designs, and treat learning as part of the job rather than something that happens after hours. We ask a lot of questions: of customers, of teammates, of our own assumptions. When we find pain, we go fix it.\n\nWe expect the same back: ask questions early, push back when you disagree, and care about the people on the other end of the API.\n\n## What you'll do\n\n* Build agents that improve retrieval: query understanding, ranking, and what to pull into context.\n* Finetune the models that extract, update, and consolidate memory on Zep's domain.\n* Finetune the models that power those agents, so the retrieval loop and the agent get better together.\n* Own the work from dataset creation through experiment design, evaluation, training, and a change that ships to production. Our engineers work the serving path alongside you.\n* Build the eval harnesses that catch regressions in retrieval, memory quality, and agent task completion before a release ships.\n* Write up what you find, including the results that killed an idea, so the rest of engineering can build on it.\n\n## Your first 90 days\n\nIn your first week you pick up an open retrieval or memory-extraction problem and frame it as an experiment. By day 30 an agent or a finetune you built is in the product loop, or you have ruled the approach out and written up why. By day 90 you are three cycles in and the eval harness you built runs on every release.\n\n## What we're looking for\n\n* You have shipped production ranking, retrieval, or query understanding.\n* You've built classical ML into a real product — logistic regression, SVMs, GBTs, single-layer perceptrons.\n* You've shipped finetuned models to production. You know transformer architectures and training workflows, and you work in PyTorch.\n* You have shipped a non-trivial agentic system to production. Not a prototype, not a thin wrapper over a chat-completion API.\n* You have a research methodology: dataset creation and curation, experiment design, and evaluation. You can frame an open problem and design an experiment that answers it.\n* You have built evaluation for retrieval, generation, or agent tasks: gold sets, offline metrics, online tests.\n* You write strong Python, and you have enough production AWS to ship, monitor, and iterate on what you train.\n* You have a Master's in Computer Science or equivalent experience.\n\n## This role is probably NOT a fit if:\n\n* Your shipped work is papers, prototypes, and demos.\n* Your agent work is a wrapper over a chat-completion API, with no eval and no model you trained.\n* You haven't finetuned a model that reached production.\n* You need a research agenda handed to you before you move.",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "skills": [
+                {
+                    "value": "LLMs",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "AI Agents",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "Torch/PyTorch",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "Python",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "Machine Learning",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "Amazon Web Services (AWS)",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                }
+            ],
+            "locations_for_search": [
+                {
+                    "value": "San Francisco, CA, US",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "San Francisco",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "CA",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "US",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                }
+            ],
+            "company_name": {
+                "value": "Zep AI",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_website": {
+                "value": "https://www.getzep.com/",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_description": {
+                "value": "Agent Context Is Hard. We Fixed It.",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_hiring_description": {
+                "value": "Zep is the context engineering platform for AI agents. We solve one of the hardest problems in production AI: getting the right context to agents at the right time. Our platform builds context graphs from conversations and business data, then assembles personalized, token-efficient context with sub-200ms retrieval. Three lines of code to production.\r\n\r\nWe're a seed-stage company (YC W24) with 50% month-over-month ARR growth, 240+ customers including Fortune 500s, and a well-capitalized balance sheet. Graphiti, our open-source temporal context graph engine, has 24,000+ GitHub stars and is becoming foundational infrastructure for agent memory.",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_parent_sector": {
+                "value": "B2B Software and Services",
+                "matchLevel": "none",
+                "matchedWords": []
+            }
+        }
+    },
+    {
+        "id": 104926,
+        "title": "ML Engineer: Speech & LLMs",
+        "description": "## About Knowtex\n\nKnowtex is building the future of voice AI operating systems for clinicians, transforming how healthcare documentation happens at the point of care. We are experiencing rapid growth across both commercial health systems and federal healthcare, with our ambient documentation platform scaling to thousands of clinicians across hundreds of specialties.\n\nWe are at an inflection point where advances in speech, language models, and clinical AI can fundamentally change how clinicians interact with technology, giving them more time to focus on what matters most: their patients.\n\n## Position Overview\n\nWe are hiring two ML Engineers / Researchers to help build the next generation of Knowtex's AI stack.\n\nWe are looking for researchers with deep expertise in one of two areas:\n\n- Speech & Audio: Build state-of-the-art medical speech-to-text systems using our large proprietary dataset of real-world clinical audio, with the goal of bringing more of our speech stack in-house.\n\n- Large Language Models: Develop and optimize models for clinical documentation and structured clinical reasoning, improving quality, cost, latency, and control.\n\nYou do not need to be an expert in both areas. We are looking for exceptional depth in either speech/audio modeling or LLMs.\n\nThese are research-heavy roles with a direct path to production. You will design experiments, build datasets and evaluation systems, train and fine-tune models, and work closely with engineering and clinical teams to deploy successful approaches at scale.\n\nThis role plays a central part in defining Knowtex's long-term ML strategy.\n\n## Key Responsibilities\n\n### Speech & Audio\n\n- Develop and train speech recognition models optimized for medical conversations across hundreds of specialties\n\n- Leverage Knowtex's large proprietary clinical audio dataset to train and fine-tune domain-specific speech models\n\n- Research approaches for improving medical terminology recognition, speaker attribution, punctuation, timestamps, and robustness across accents and clinical environments\n\n- Build rigorous speech evaluation frameworks beyond traditional WER, including medical terminology and clinically significant error measurement\n\n- Explore modern speech architectures, self-supervised learning, speech foundation models, and audio-language models\n\n- Optimize models for low-latency, real-time inference at production scale\n\n### Large Language Models\n\n- Develop and optimize models for generating high-quality clinical documentation, including SOAP notes and specialty-specific note formats\n\n- Build models for downstream clinical tasks such as medication extraction, orders, ICD-10 coding, E&M coding, patient visit summaries, and other structured clinical artifacts\n\n- Evaluate open-weight and proprietary model architectures and determine where fine-tuning, distillation, structured generation, or task-specific models can outperform general-purpose API-based approaches\n\n- Fine-tune and post-train models using Knowtex's proprietary clinical datasets\n\n- Develop rigorous evaluation frameworks for clinical accuracy, hallucinations, completeness, formatting, and clinician preferences\n\n- Research approaches for reducing inference cost and latency while maintaining or improving clinical quality\n\n### Across Both Tracks\n\n- Move quickly from idea → dataset → experiment → evaluation → production\n\n- Design experiments that clearly measure whether an approach improves real-world clinical outcomes\n\n- Build datasets, benchmarks, and evaluation infrastructure that make model improvements measurable and reproducible\n\n- Collaborate closely with clinicians, applied ML engineers, and platform engineers\n\n- Take successful research beyond prototypes and help deploy models into production\n\n- Balance model quality with latency, inference cost, reliability, and scalability\n\n## Required Qualifications\n\n- 2+ years of experience in machine learning research or ML engineering, with deep expertise in speech/audio modeling or large language models\n\n- Strong expertise in Python and PyTorch\n\n- Deep understanding of modern transformer architectures and model training techniques\n\n- Experience training, fine-tuning, or post-training large neural models\n\n- Strong experimental methodology and ability to independently design and execute research projects\n\n- Experience working with large-scale datasets and distributed training environments\n\n- Ability to translate research results into production systems\n\n- Strong understanding of model evaluation and benchmarking\n\n- Bachelor’s, Master’s, or PhD in Computer Science, Machine Learning, or a related technical field, or equivalent research experience\n\n## Preferred Qualifications\n\n### For Speech Researchers\n\n- Deep experience with automatic speech recognition (ASR)\n\n- Experience training or fine-tuning Whisper, Conformer, wav2vec, or similar speech architectures\n\n- Experience with large-scale audio datasets and speech data pipelines\n\n- Familiarity with speaker diarization, voice activity detection, streaming ASR, or audio-language models\n\n- Experience optimizing speech models for real-time inference\n\n### For LLM Researchers\n\n- Experience fine-tuning or post-training open-weight LLMs\n\n- Experience with supervised fine-tuning, distillation, preference optimization, or reinforcement learning\n\n- Experience building LLM evaluation systems and model benchmarks\n\n- Experience serving and optimizing open-weight models at scale\n\n- Experience with structured generation, tool use, or agentic systems\n\n### For Either Track\n\n- Experience in healthcare AI, clinical NLP, or medical speech\n\n- Familiarity with clinical documentation workflows and medical terminology\n\n- Knowledge of coding systems such as ICD-10, CPT, E&M, or SNOMED\n\n- Publications at leading ML, NLP, or speech conferences\n\n- Experience deploying ML systems in HIPAA-compliant or regulated environments\n\n- Experience working in fast-moving startup environments where researchers own projects from experimentation through production\n\n## Technical Environment\n\n- AWS\n\n- Python, PyTorch\n\n- Transformer-based LLM and speech architectures\n\n- Open-weight and frontier language models\n\n- Large-scale clinical audio and text datasets\n\n- Distributed model training and inference\n\n- GPU-based model serving and optimization\n\n- Real-time speech and clinical AI pipelines\n\n- Structured clinical evaluation and benchmarking infrastructure\n\n## Compensation & Benefits\n\n- Competitive salary\n\n- Meaningful equity compensation\n\n- Unlimited PTO\n\n- Premium health, dental, and vision coverage\n\n- 401(k) plan\n\n- Work model: Hybrid In-person\n\n",
+        "job_type": "fulltime",
+        "remote": "no",
+        "role": "eng",
+        "eng_type": [
+            "ml"
+        ],
+        "design_type": null,
+        "science_type": null,
+        "recruiting_type": null,
+        "min_experience": 1,
+        "created_at": "2026-08-17T16:52:53.417Z",
+        "skills": [],
+        "has_interview_process": false,
+        "has_salary": true,
+        "has_equity": false,
+        "us_visa_required": "yes",
+        "locations_for_search": [
+            "US",
+            "CA, US",
+            "San Francisco, CA, US"
+        ],
+        "company_id": 27185,
+        "company_name": "Knowtex",
+        "company_website": "http://www.knowtex.ai/",
+        "company_description": "Making doctors 2x more efficient with AI note-taking & charge capture",
+        "company_created_at": "2022-05-27T06:03:45.346Z",
+        "company_hiring_description": "Knowtex is building the clinical AI infrastructure layer for intelligent care— turning the burden of manual workflows like notes, coding, order entry into a seamless background process, and providing real-time decision support so clinicians can focus on what matters: delivering superior patient care. \r\n\r\nWe are nationally deployed across the largest U.S. health system, the U.S. Department of Veterans Affairs, and we work with health systems, specialty practices, and ambulatory groups who are done waiting for EHR vendors to solve AI.",
+        "company_parent_sector": "Healthcare",
+        "company_child_sector": "Healthcare IT",
+        "company_team_size": null,
+        "company_highlight_black": false,
+        "company_highlight_latinx": false,
+        "company_highlight_women": true,
+        "company_waas_stage": "seed",
+        "company_waas_activity_score": 49.08,
+        "search_path": "https://www.ycombinator.com/companies/knowtex/jobs/qluqYAK-ml-engineer-speech-llms",
+        "model_type": "JobsCompanyJob",
+        "model_id": 104926,
+        "_tags": [
+            [
+                "yc_staff",
+                "jobs_applicant",
+                "public"
+            ]
+        ],
+        "objectID": "104926",
+        "_highlightResult": {
+            "title": {
+                "value": "ML Engineer: Speech & LLMs",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "description": {
+                "value": "## About Knowtex\n\nKnowtex is building the future of voice AI operating systems for clinicians, transforming how healthcare documentation happens at the point of care. We are experiencing rapid growth across both commercial health systems and federal healthcare, with our ambient documentation platform scaling to thousands of clinicians across hundreds of specialties.\n\nWe are at an inflection point where advances in speech, language models, and clinical AI can fundamentally change how clinicians interact with technology, giving them more time to focus on what matters most: their patients.\n\n## Position Overview\n\nWe are hiring two ML Engineers / Researchers to help build the next generation of Knowtex's AI stack.\n\nWe are looking for researchers with deep expertise in one of two areas:\n\n- Speech & Audio: Build state-of-the-art medical speech-to-text systems using our large proprietary dataset of real-world clinical audio, with the goal of bringing more of our speech stack in-house.\n\n- Large Language Models: Develop and optimize models for clinical documentation and structured clinical reasoning, improving quality, cost, latency, and control.\n\nYou do not need to be an expert in both areas. We are looking for exceptional depth in either speech/audio modeling or LLMs.\n\nThese are research-heavy roles with a direct path to production. You will design experiments, build datasets and evaluation systems, train and fine-tune models, and work closely with engineering and clinical teams to deploy successful approaches at scale.\n\nThis role plays a central part in defining Knowtex's long-term ML strategy.\n\n## Key Responsibilities\n\n### Speech & Audio\n\n- Develop and train speech recognition models optimized for medical conversations across hundreds of specialties\n\n- Leverage Knowtex's large proprietary clinical audio dataset to train and fine-tune domain-specific speech models\n\n- Research approaches for improving medical terminology recognition, speaker attribution, punctuation, timestamps, and robustness across accents and clinical environments\n\n- Build rigorous speech evaluation frameworks beyond traditional WER, including medical terminology and clinically significant error measurement\n\n- Explore modern speech architectures, self-supervised learning, speech foundation models, and audio-language models\n\n- Optimize models for low-latency, real-time inference at production scale\n\n### Large Language Models\n\n- Develop and optimize models for generating high-quality clinical documentation, including SOAP notes and specialty-specific note formats\n\n- Build models for downstream clinical tasks such as medication extraction, orders, ICD-10 coding, E&M coding, patient visit summaries, and other structured clinical artifacts\n\n- Evaluate open-weight and proprietary model architectures and determine where fine-tuning, distillation, structured generation, or task-specific models can outperform general-purpose API-based approaches\n\n- Fine-tune and post-train models using Knowtex's proprietary clinical datasets\n\n- Develop rigorous evaluation frameworks for clinical accuracy, hallucinations, completeness, formatting, and clinician preferences\n\n- Research approaches for reducing inference cost and latency while maintaining or improving clinical quality\n\n### Across Both Tracks\n\n- Move quickly from idea → dataset → experiment → evaluation → production\n\n- Design experiments that clearly measure whether an approach improves real-world clinical outcomes\n\n- Build datasets, benchmarks, and evaluation infrastructure that make model improvements measurable and reproducible\n\n- Collaborate closely with clinicians, applied ML engineers, and platform engineers\n\n- Take successful research beyond prototypes and help deploy models into production\n\n- Balance model quality with latency, inference cost, reliability, and scalability\n\n## Required Qualifications\n\n- 2+ years of experience in machine learning research or ML engineering, with deep expertise in speech/audio modeling or large language models\n\n- Strong expertise in Python and PyTorch\n\n- Deep understanding of modern transformer architectures and model training techniques\n\n- Experience training, fine-tuning, or post-training large neural models\n\n- Strong experimental methodology and ability to independently design and execute research projects\n\n- Experience working with large-scale datasets and distributed training environments\n\n- Ability to translate research results into production systems\n\n- Strong understanding of model evaluation and benchmarking\n\n- Bachelor’s, Master’s, or PhD in Computer Science, Machine Learning, or a related technical field, or equivalent research experience\n\n## Preferred Qualifications\n\n### For Speech Researchers\n\n- Deep experience with automatic speech recognition (ASR)\n\n- Experience training or fine-tuning Whisper, Conformer, wav2vec, or similar speech architectures\n\n- Experience with large-scale audio datasets and speech data pipelines\n\n- Familiarity with speaker diarization, voice activity detection, streaming ASR, or audio-language models\n\n- Experience optimizing speech models for real-time inference\n\n### For LLM Researchers\n\n- Experience fine-tuning or post-training open-weight LLMs\n\n- Experience with supervised fine-tuning, distillation, preference optimization, or reinforcement learning\n\n- Experience building LLM evaluation systems and model benchmarks\n\n- Experience serving and optimizing open-weight models at scale\n\n- Experience with structured generation, tool use, or agentic systems\n\n### For Either Track\n\n- Experience in healthcare AI, clinical NLP, or medical speech\n\n- Familiarity with clinical documentation workflows and medical terminology\n\n- Knowledge of coding systems such as ICD-10, CPT, E&M, or SNOMED\n\n- Publications at leading ML, NLP, or speech conferences\n\n- Experience deploying ML systems in HIPAA-compliant or regulated environments\n\n- Experience working in fast-moving startup environments where researchers own projects from experimentation through production\n\n## Technical Environment\n\n- AWS\n\n- Python, PyTorch\n\n- Transformer-based LLM and speech architectures\n\n- Open-weight and frontier language models\n\n- Large-scale clinical audio and text datasets\n\n- Distributed model training and inference\n\n- GPU-based model serving and optimization\n\n- Real-time speech and clinical AI pipelines\n\n- Structured clinical evaluation and benchmarking infrastructure\n\n## Compensation & Benefits\n\n- Competitive salary\n\n- Meaningful equity compensation\n\n- Unlimited PTO\n\n- Premium health, dental, and vision coverage\n\n- 401(k) plan\n\n- Work model: Hybrid In-person\n\n",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "locations_for_search": [
+                {
+                    "value": "US",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "CA, US",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "San Francisco, CA, US",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                }
+            ],
+            "company_name": {
+                "value": "Knowtex",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_website": {
+                "value": "http://www.knowtex.ai/",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_description": {
+                "value": "Making doctors 2x more efficient with AI note-taking & charge capture",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_hiring_description": {
+                "value": "Knowtex is building the clinical AI infrastructure layer for intelligent care— turning the burden of manual workflows like notes, coding, order entry into a seamless background process, and providing real-time decision support so clinicians can focus on what matters: delivering superior patient care. \r\n\r\nWe are nationally deployed across the largest U.S. health system, the U.S. Department of Veterans Affairs, and we work with health systems, specialty practices, and ambulatory groups who are done waiting for EHR vendors to solve AI.",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_parent_sector": {
+                "value": "Healthcare",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_child_sector": {
+                "value": "Healthcare IT",
+                "matchLevel": "none",
+                "matchedWords": []
+            }
+        }
+    },
+    {
+        "id": 104833,
+        "title": "Member of Technical Staff (Models)",
+        "description": "As a Member of Technical Staff on Models, you'll own the post-training loop that improves the performance of our AI Employees. You will be defining how we train models to do mission critical work in the real world.\n\n**Areas you may work in:**\n\n* Post-training and fine-tuning\n* Turning agent traces and expert feedback into training data\n* Reward modeling and graders for non-verifiable outcomes\n* Distillation into smaller, faster, cheaper models\n* Designing and running training experiments\n\n**You may be a good fit if you:**\n\n* Have trained or fine-tuned models and shipped the result into a product\n* Have hands-on experience with SFT, preference optimization, or RLHF\n* Can read traces and tell whether a metric measures the thing that matters\n* Have strong software engineering fundamentals alongside ML depth\n* Want to work in person in San Francisco\n\n**Even better:**\n\n* You've adapted open-weight models to a specialized domain\n* You've built training data or evaluation infrastructure\n* You contribute to open source projects",
+        "job_type": "fulltime",
+        "remote": "no",
+        "role": "eng",
+        "eng_type": [
+            "ml"
+        ],
+        "design_type": null,
+        "science_type": null,
+        "recruiting_type": null,
+        "min_experience": 3,
+        "created_at": "2026-08-17T01:40:13.013Z",
+        "skills": [
+            "Machine Learning"
+        ],
+        "has_interview_process": false,
+        "has_salary": true,
+        "has_equity": true,
+        "us_visa_required": "yes",
+        "locations_for_search": [
+            "San Francisco, CA, US",
+            "San Francisco",
+            "CA",
+            "US"
+        ],
+        "company_id": 30972,
+        "company_name": "Jarmin",
+        "company_website": "https://jarmin.ai/",
+        "company_description": "AI Employees for human-level roles",
+        "company_created_at": "2025-08-27T21:25:06.030Z",
+        "company_hiring_description": "Jarmin.ai builds AI employees for human-level roles. It learns its responsibilities, understands your data, embeds into your systems, and becomes part of your team's day-to-day workflow. Completely hand over full initiatives or individual tasks.\r\n\r\nHire AI ML Engineers, Account Executives, Paralegals, Financial analysts, Compliance analysts, and more.\r\n\r\nJarmin’s founding team is from Meta SuperIntelligence Labs (Staff Engineers), Apple (Machine Learning Engineer), AWS (scaling infra), Lockheed-Martin (Research), and JPMorganChase (SWE) with experience building AI/ML and automating complex work of Researchers, Data Scientists, ML Engineers with AI.",
+        "company_parent_sector": "B2B Software and Services",
+        "company_child_sector": null,
+        "company_team_size": 5,
+        "company_highlight_black": true,
+        "company_highlight_latinx": false,
+        "company_highlight_women": false,
+        "company_waas_stage": "unannouced",
+        "company_waas_activity_score": 29.08,
+        "search_path": "https://www.ycombinator.com/companies/jarmin/jobs/C10ltH6-member-of-technical-staff-models",
+        "model_type": "JobsCompanyJob",
+        "model_id": 104833,
+        "_tags": [
+            [
+                "yc_staff",
+                "jobs_applicant",
+                "public"
+            ]
+        ],
+        "objectID": "104833",
+        "_highlightResult": {
+            "title": {
+                "value": "Member of Technical Staff (Models)",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "description": {
+                "value": "As a Member of Technical Staff on Models, you'll own the post-training loop that improves the performance of our AI Employees. You will be defining how we train models to do mission critical work in the real world.\n\n**Areas you may work in:**\n\n* Post-training and fine-tuning\n* Turning agent traces and expert feedback into training data\n* Reward modeling and graders for non-verifiable outcomes\n* Distillation into smaller, faster, cheaper models\n* Designing and running training experiments\n\n**You may be a good fit if you:**\n\n* Have trained or fine-tuned models and shipped the result into a product\n* Have hands-on experience with SFT, preference optimization, or RLHF\n* Can read traces and tell whether a metric measures the thing that matters\n* Have strong software engineering fundamentals alongside ML depth\n* Want to work in person in San Francisco\n\n**Even better:**\n\n* You've adapted open-weight models to a specialized domain\n* You've built training data or evaluation infrastructure\n* You contribute to open source projects",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "skills": [
+                {
+                    "value": "Machine Learning",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                }
+            ],
+            "locations_for_search": [
+                {
+                    "value": "San Francisco, CA, US",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "San Francisco",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "CA",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "US",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                }
+            ],
+            "company_name": {
+                "value": "Jarmin",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_website": {
+                "value": "https://jarmin.ai/",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_description": {
+                "value": "AI Employees for human-level roles",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_hiring_description": {
+                "value": "Jarmin.ai builds AI employees for human-level roles. It learns its responsibilities, understands your data, embeds into your systems, and becomes part of your team's day-to-day workflow. Completely hand over full initiatives or individual tasks.\r\n\r\nHire AI ML Engineers, Account Executives, Paralegals, Financial analysts, Compliance analysts, and more.\r\n\r\nJarmin’s founding team is from Meta SuperIntelligence Labs (Staff Engineers), Apple (Machine Learning Engineer), AWS (scaling infra), Lockheed-Martin (Research), and JPMorganChase (SWE) with experience building AI/ML and automating complex work of Researchers, Data Scientists, ML Engineers with AI.",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_parent_sector": {
+                "value": "B2B Software and Services",
+                "matchLevel": "none",
+                "matchedWords": []
+            }
+        }
+    },
+    {
+        "id": 104832,
+        "title": "Member of Technical Staff (Evals)",
+        "description": "As a Member of Technical Staff on Evals, you'll own how we measure AI Employee performance on the job.\n\n**Areas you may work in:**\n\n* Evaluation systems: datasets, offline replay, scorers, and regression alerts\n* Feedback loops for models and agents\n* Autonomous failure analysis\n* Defining what good, degraded, and failed runs look like, and alerting on them\n\n**You may be a good fit if you:**\n\n* Have built evaluation or measurement systems, such as AI evals, experimentation, ranking, or search quality\n* Can turn ambiguous quality questions into concrete metrics and decisions\n* Have strong software engineering fundamentals and ship production systems\n* Are comfortable where there are few established patterns\n* Want to work in person in San Francisco\n\n**Even better:**\n\n* You've shipped LLM systems to production and learned where they break\n* You have strong data instincts and work well with researchers\n* You contribute to open source projects",
+        "job_type": "fulltime",
+        "remote": "no",
+        "role": "eng",
+        "eng_type": [
+            "ml"
+        ],
+        "design_type": null,
+        "science_type": null,
+        "recruiting_type": null,
+        "min_experience": 3,
+        "created_at": "2026-08-17T01:37:45.487Z",
+        "skills": [
+            "Evals",
+            "Machine Learning"
+        ],
+        "has_interview_process": false,
+        "has_salary": true,
+        "has_equity": true,
+        "us_visa_required": "yes",
+        "locations_for_search": [
+            "US",
+            "CA, US",
+            "San Francisco, CA, US"
+        ],
+        "company_id": 30972,
+        "company_name": "Jarmin",
+        "company_website": "https://jarmin.ai/",
+        "company_description": "AI Employees for human-level roles",
+        "company_created_at": "2025-08-27T21:25:06.030Z",
+        "company_hiring_description": "Jarmin.ai builds AI employees for human-level roles. It learns its responsibilities, understands your data, embeds into your systems, and becomes part of your team's day-to-day workflow. Completely hand over full initiatives or individual tasks.\r\n\r\nHire AI ML Engineers, Account Executives, Paralegals, Financial analysts, Compliance analysts, and more.\r\n\r\nJarmin’s founding team is from Meta SuperIntelligence Labs (Staff Engineers), Apple (Machine Learning Engineer), AWS (scaling infra), Lockheed-Martin (Research), and JPMorganChase (SWE) with experience building AI/ML and automating complex work of Researchers, Data Scientists, ML Engineers with AI.",
+        "company_parent_sector": "B2B Software and Services",
+        "company_child_sector": null,
+        "company_team_size": 5,
+        "company_highlight_black": true,
+        "company_highlight_latinx": false,
+        "company_highlight_women": false,
+        "company_waas_stage": "unannouced",
+        "company_waas_activity_score": 29.08,
+        "search_path": "https://www.ycombinator.com/companies/jarmin/jobs/K9ot5wF-member-of-technical-staff-evals",
+        "model_type": "JobsCompanyJob",
+        "model_id": 104832,
+        "_tags": [
+            [
+                "yc_staff",
+                "jobs_applicant",
+                "public"
+            ]
+        ],
+        "objectID": "104832",
+        "_highlightResult": {
+            "title": {
+                "value": "Member of Technical Staff (Evals)",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "description": {
+                "value": "As a Member of Technical Staff on Evals, you'll own how we measure AI Employee performance on the job.\n\n**Areas you may work in:**\n\n* Evaluation systems: datasets, offline replay, scorers, and regression alerts\n* Feedback loops for models and agents\n* Autonomous failure analysis\n* Defining what good, degraded, and failed runs look like, and alerting on them\n\n**You may be a good fit if you:**\n\n* Have built evaluation or measurement systems, such as AI evals, experimentation, ranking, or search quality\n* Can turn ambiguous quality questions into concrete metrics and decisions\n* Have strong software engineering fundamentals and ship production systems\n* Are comfortable where there are few established patterns\n* Want to work in person in San Francisco\n\n**Even better:**\n\n* You've shipped LLM systems to production and learned where they break\n* You have strong data instincts and work well with researchers\n* You contribute to open source projects",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "skills": [
+                {
+                    "value": "Evals",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "Machine Learning",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                }
+            ],
+            "locations_for_search": [
+                {
+                    "value": "US",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "CA, US",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "San Francisco, CA, US",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                }
+            ],
+            "company_name": {
+                "value": "Jarmin",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_website": {
+                "value": "https://jarmin.ai/",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_description": {
+                "value": "AI Employees for human-level roles",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_hiring_description": {
+                "value": "Jarmin.ai builds AI employees for human-level roles. It learns its responsibilities, understands your data, embeds into your systems, and becomes part of your team's day-to-day workflow. Completely hand over full initiatives or individual tasks.\r\n\r\nHire AI ML Engineers, Account Executives, Paralegals, Financial analysts, Compliance analysts, and more.\r\n\r\nJarmin’s founding team is from Meta SuperIntelligence Labs (Staff Engineers), Apple (Machine Learning Engineer), AWS (scaling infra), Lockheed-Martin (Research), and JPMorganChase (SWE) with experience building AI/ML and automating complex work of Researchers, Data Scientists, ML Engineers with AI.",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_parent_sector": {
+                "value": "B2B Software and Services",
+                "matchLevel": "none",
+                "matchedWords": []
+            }
+        }
+    },
+    {
+        "id": 104525,
+        "title": "Founding Research Engineer",
+        "description": "### **Description:**\n\nJoin Mbodi AI (YC X25), an AI robotics startup founded by two former Googlers committed to pushing the boundaries of intelligent robots. Mbodi is an embodied AI platform that makes robots learn like humans, with natural language. So anyone can teach robots new skills by talking to them and execute the learned skills reliably in production, in minutes. We are pioneering the next wave of robotics, where advanced generative models meet real-world applications. Backed by top investors and already working with global industrial partners (e.g., ABB), we’re redefining what’s possible in robotics and automation.\n\nWe’re looking for a **Founding Research / ML Engineer** to join our core founding team. You’ll be responsible for developing and deploying cutting-edge ML models and agentic AI systems that power robot learning and behavior. As a founding team member, you’ll play a critical role in shaping our technology, culture, and mission from the ground up.\n\n### **What you’ll do:**\n\n* Conduct cutting-edge research at the intersection of generative AI and robotics, focusing on transformers, diffusion models, and advanced ML architectures\n* Design and implement algorithms that apply AI to complex, real-world robotics tasks\n* Build robust, scalable systems that connect foundational models to physical-world execution, turning theory into impact\n* Collaborate across disciplines to advance agent orchestration and intelligent system integration\n* Drive technical direction, architecture decisions, and research strategy from day one\n\n### **What we’re looking for:**\n\n* A track record of impactful research in AI, robotics, or machine learning, with strong system-building and implementation skills\n* Deep knowledge of transformers, diffusion models, and cutting-edge techniques in AI\n* Experience with ML models, data pipelines, and complex system architectures in real-world applications\n* Adaptable, execution-focused, and thrives in the pace and ambiguity of startup life",
+        "job_type": "fulltime",
+        "remote": "no",
+        "role": "eng",
+        "eng_type": [
+            "ml"
+        ],
+        "design_type": null,
+        "science_type": null,
+        "recruiting_type": null,
+        "min_experience": 1,
+        "created_at": "2026-08-14T19:45:17.709Z",
+        "skills": [
+            "AI Agents",
+            "ML",
+            "Python"
+        ],
+        "has_interview_process": false,
+        "has_salary": true,
+        "has_equity": true,
+        "us_visa_required": "possible",
+        "locations_for_search": [
+            "US",
+            "NY, US",
+            "New York, NY, US"
+        ],
+        "company_id": 30445,
+        "company_name": "Mbodi AI",
+        "company_website": "https://www.mbodi.ai/",
+        "company_description": "Industrial Robots that Learn and Operate Like Humans",
+        "company_created_at": "2025-02-25T19:29:20.790Z",
+        "company_hiring_description": "Mbodi is an embodied AI platform that makes robots learn like humans, with natural language. So anyone can teach robots new skills by talking to them and execute the learned skills reliably in production, in minutes. We are pioneering the next wave of robotics, where advanced generative models meet real-world applications. Backed by top investors and already working with global industrial partners (e.g., ABB), we’re redefining what’s possible in robotics and automation.",
+        "company_parent_sector": "Industrials",
+        "company_child_sector": "Manufacturing and Robotics",
+        "company_team_size": 6,
+        "company_highlight_black": false,
+        "company_highlight_latinx": false,
+        "company_highlight_women": false,
+        "company_waas_stage": "seed",
+        "company_waas_activity_score": 50,
+        "search_path": "https://www.ycombinator.com/companies/mbodi-ai/jobs/NJF6jNS-founding-research-engineer",
+        "model_type": "JobsCompanyJob",
+        "model_id": 104525,
+        "_tags": [
+            [
+                "yc_staff",
+                "jobs_applicant",
+                "public"
+            ]
+        ],
+        "objectID": "104525",
+        "_highlightResult": {
+            "title": {
+                "value": "Founding Research Engineer",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "description": {
+                "value": "### **Description:**\n\nJoin Mbodi AI (YC X25), an AI robotics startup founded by two former Googlers committed to pushing the boundaries of intelligent robots. Mbodi is an embodied AI platform that makes robots learn like humans, with natural language. So anyone can teach robots new skills by talking to them and execute the learned skills reliably in production, in minutes. We are pioneering the next wave of robotics, where advanced generative models meet real-world applications. Backed by top investors and already working with global industrial partners (e.g., ABB), we’re redefining what’s possible in robotics and automation.\n\nWe’re looking for a **Founding Research / ML Engineer** to join our core founding team. You’ll be responsible for developing and deploying cutting-edge ML models and agentic AI systems that power robot learning and behavior. As a founding team member, you’ll play a critical role in shaping our technology, culture, and mission from the ground up.\n\n### **What you’ll do:**\n\n* Conduct cutting-edge research at the intersection of generative AI and robotics, focusing on transformers, diffusion models, and advanced ML architectures\n* Design and implement algorithms that apply AI to complex, real-world robotics tasks\n* Build robust, scalable systems that connect foundational models to physical-world execution, turning theory into impact\n* Collaborate across disciplines to advance agent orchestration and intelligent system integration\n* Drive technical direction, architecture decisions, and research strategy from day one\n\n### **What we’re looking for:**\n\n* A track record of impactful research in AI, robotics, or machine learning, with strong system-building and implementation skills\n* Deep knowledge of transformers, diffusion models, and cutting-edge techniques in AI\n* Experience with ML models, data pipelines, and complex system architectures in real-world applications\n* Adaptable, execution-focused, and thrives in the pace and ambiguity of startup life",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "skills": [
+                {
+                    "value": "AI Agents",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "ML",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "Python",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                }
+            ],
+            "locations_for_search": [
+                {
+                    "value": "US",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "NY, US",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                },
+                {
+                    "value": "New York, NY, US",
+                    "matchLevel": "none",
+                    "matchedWords": []
+                }
+            ],
+            "company_name": {
+                "value": "Mbodi AI",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_website": {
+                "value": "https://www.mbodi.ai/",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_description": {
+                "value": "Industrial Robots that Learn and Operate Like Humans",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_hiring_description": {
+                "value": "Mbodi is an embodied AI platform that makes robots learn like humans, with natural language. So anyone can teach robots new skills by talking to them and execute the learned skills reliably in production, in minutes. We are pioneering the next wave of robotics, where advanced generative models meet real-world applications. Backed by top investors and already working with global industrial partners (e.g., ABB), we’re redefining what’s possible in robotics and automation.",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_parent_sector": {
+                "value": "Industrials",
+                "matchLevel": "none",
+                "matchedWords": []
+            },
+            "company_child_sector": {
+                "value": "Manufacturing and Robotics",
+                "matchLevel": "none",
+                "matchedWords": []
+            }
+        }
+    }
+]

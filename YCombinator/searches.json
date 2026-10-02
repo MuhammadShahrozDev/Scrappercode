@@ -1,0 +1,19 @@
+[
+    {
+        "name": "Machine-Learning",
+        "role": "eng",
+        "eng_type": "ml"
+    },
+    {
+        "name": "Product",
+        "role": "product"
+    },
+    {
+        "name": "Sales",
+        "role": "sales"
+    },
+    {
+        "name": "Marketing",
+        "role": "marketing"
+    }
+]
