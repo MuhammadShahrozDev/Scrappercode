@@ -51,7 +51,7 @@ class LinkedInIntelligenceScraper:
   def _init_driver(self):
     options = webdriver.ChromeOptions()
     # Headless mode configurations
-    # options.add_argument("--headless=new")
+    options.add_argument("--headless=new")
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
