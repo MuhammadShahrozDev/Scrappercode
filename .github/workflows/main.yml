@@ -26,4 +26,9 @@ jobs:
           playwright install --with-deps chromium
 
       - name: Run scraper pipeline
+        env:
+          ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
+          ALGOLIA_API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
+          URL: ${{ secrets.URL }}
+          LINKEDIN_LI_AT: ${{ secrets.LINKEDIN_LI_AT }}
         run: python main.py
