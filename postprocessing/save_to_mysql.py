@@ -1,21 +1,25 @@
+import json
 import os
 from pathlib import Path
 
 import mysql.connector
-import pandas as pd
 
 
 BASE_DIR = Path(__file__).resolve().parent
-INPUT_FILE = BASE_DIR / "jobs" / "jobs_combined.xlsx"
+INPUT_FILE = BASE_DIR / "jobs" / "jobs_combined.json"
 
 
 def clean_value(value):
-    if pd.isna(value):
+    if value is None:
         return None
 
     if isinstance(value, str):
         value = value.strip()
-        return value if value else None
+
+        if value == "":
+            return None
+
+        return value
 
     return value
 
@@ -51,11 +55,22 @@ def main():
             f"Final jobs file not found: {INPUT_FILE}"
         )
 
-    df = pd.read_excel(INPUT_FILE)
+    with open(INPUT_FILE, "r", encoding="utf-8") as file:
+        jobs = json.load(file)
 
-    print(f"Loaded {len(df)} jobs for MySQL.")
+    if not isinstance(jobs, list):
+        raise ValueError(
+            "jobs_combined.json must contain a JSON list."
+        )
+
+    print(f"Loaded {len(jobs)} jobs for MySQL.")
+
+    print("Connecting to MySQL...")
 
     connection = get_connection()
+
+    print("MySQL connection successful.")
+
     cursor = connection.cursor()
 
     query = """
@@ -103,40 +118,41 @@ def main():
     skipped = 0
 
     try:
-        for _, row in df.iterrows():
+        for job in jobs:
 
-            job_url = clean_value(row.get("job_url"))
+            job_url = clean_value(job.get("job_url"))
 
             if not job_url:
                 skipped += 1
 
                 print(
                     f"[SKIP] Missing job_url: "
-                    f"{clean_value(row.get('company_name'))} - "
-                    f"{clean_value(row.get('job_title'))}"
+                    f"{clean_value(job.get('company_name'))} - "
+                    f"{clean_value(job.get('job_title'))}"
                 )
 
                 continue
 
             values = (
-                clean_value(row.get("source")),
-                clean_value(row.get("job_title")),
-                clean_value(row.get("job_description")),
-                clean_value(row.get("role")),
-                clean_value(row.get("company_name")),
-                clean_value(row.get("company_website")),
-                clean_value(row.get("company_linkedin")),
-                clean_value(row.get("hiring_contact")),
-                clean_value(row.get("person_1_name")),
-                clean_value(row.get("person_1_role")),
-                clean_value(row.get("person_1_profile_url")),
-                clean_value(row.get("person_2_name")),
-                clean_value(row.get("person_2_role")),
-                clean_value(row.get("person_2_profile_url")),
+                clean_value(job.get("source")),
+                clean_value(job.get("job_title")),
+                clean_value(job.get("job_description")),
+                clean_value(job.get("role")),
+                clean_value(job.get("company_name")),
+                clean_value(job.get("company_website")),
+                clean_value(job.get("company_linkedin")),
+                clean_value(job.get("hiring_contact")),
+                clean_value(job.get("person_1_name")),
+                clean_value(job.get("person_1_role")),
+                clean_value(job.get("person_1_profile_url")),
+                clean_value(job.get("person_2_name")),
+                clean_value(job.get("person_2_role")),
+                clean_value(job.get("person_2_profile_url")),
                 job_url,
             )
 
             cursor.execute(query, values)
+
             processed += 1
 
         connection.commit()
@@ -147,13 +163,21 @@ def main():
         print(f"Skipped:   {skipped}")
         print("=" * 60)
 
-    except Exception:
+    except Exception as error:
+
         connection.rollback()
+
+        print("MySQL sync failed.")
+        print(f"Error: {error}")
+
         raise
 
     finally:
+
         cursor.close()
         connection.close()
+
+        print("MySQL connection closed.")
 
 
 if __name__ == "__main__":
