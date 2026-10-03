@@ -44,4 +44,5 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
-        run: python postprocessing/save_to_mysql.py
+        
+        run: python main.py
