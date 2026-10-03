@@ -8,6 +8,7 @@ scripts = [
     "combine_sources.py",
     "all_jobs_to_excel.py",
     "separate_jobs.py",
+    "save_to_mysql.py",
 ]
 
 for script in scripts:
@@ -22,3 +23,4 @@ for script in scripts:
 
 print("\npostprocessing pipeline completed successfully.")
 print("Final output: jobs/jobs_combined_filtered.xlsx")
+print("Jobs synchronized with Hostinger MySQL successfully.")
