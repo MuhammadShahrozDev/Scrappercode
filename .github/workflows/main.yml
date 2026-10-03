@@ -3,6 +3,10 @@ name: Scraper Pipeline
 on:
   workflow_dispatch:
 
+  schedule:
+    # 14:00 UTC = 19:00 PKT (7:00 PM Pakistan)
+    - cron: "0 14 * * *"
+
 jobs:
   run-scraper:
     runs-on: ubuntu-latest
@@ -31,7 +35,7 @@ jobs:
           sudo apt-get install -y google-chrome-stable
           google-chrome --version
 
-      - name: Run MySQL test
+      - name: Run scraper pipeline
         env:
           ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
           ALGOLIA_API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
@@ -44,5 +48,4 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
-        
         run: python main.py
