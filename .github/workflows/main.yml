@@ -25,6 +25,12 @@ jobs:
         run: |
           playwright install --with-deps chromium
 
+      - name: Install Google Chrome for Selenium
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+          google-chrome --version
+
       - name: Run scraper pipeline
         env:
           ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
