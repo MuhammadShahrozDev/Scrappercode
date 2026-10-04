@@ -2,8 +2,8 @@ import os
 import json
 import requests
 
-API_URL = os.getenv("LUXRA_API_URL", "").rstrip("/")
-INGEST_TOKEN = os.getenv("LUXRA_INGEST_TOKEN", "")
+API_URL = os.getenv("SMART_SCRAPER_API_URL", "").rstrip("/")
+INGEST_TOKEN = os.getenv("SMART_SCRAPER_INGEST_TOKEN", "")
 
 INPUT_FILE = "postprocessing/jobs/jobs_combined.json"
 BATCH_SIZE = 100
@@ -52,10 +52,10 @@ def normalize_job(job):
 
 def send_batch(batch, batch_number):
     if not API_URL:
-        raise RuntimeError("LUXRA_API_URL is missing")
+        raise RuntimeError("SMART_SCRAPER_API_URL is missing")
 
     if not INGEST_TOKEN:
-        raise RuntimeError("LUXRA_INGEST_TOKEN is missing")
+        raise RuntimeError("SMART_SCRAPER_INGEST_TOKEN is missing")
 
     endpoint = f"{API_URL}/api/v1/scraper/ingest.php"
 
