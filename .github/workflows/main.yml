@@ -26,6 +26,7 @@ on:
 jobs:
   run-scraper:
     runs-on: ubuntu-latest
+    timeout-minutes: 190
 
     env:
       SMART_SCRAPER_API_URL: ${{ secrets.SMART_SCRAPER_API_URL }}
@@ -36,16 +37,13 @@ jobs:
       SMART_SCRAPER_BATCH_SIZE: ${{ github.event.inputs.batch }}
       SMART_SCRAPER_MAX_RUNTIME: ${{ github.event.inputs.max_runtime }}
 
-      ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
-      ALGOLIA_API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
-      URL: ${{ secrets.URL }}
       LINKEDIN_LI_AT: ${{ secrets.LINKEDIN_LI_AT }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -63,6 +61,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
+          google-chrome --version
 
       - name: Run smart_scraper
         run: python main.py
