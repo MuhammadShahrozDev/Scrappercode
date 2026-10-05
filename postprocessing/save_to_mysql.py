@@ -7,12 +7,26 @@ from pathlib import Path
 import requests
 
 
-API_URL = os.getenv("SMART_SCRAPER_API_URL", "").rstrip("/")
-INGEST_TOKEN = os.getenv("SMART_SCRAPER_INGEST_TOKEN", "")
-RUN_ID = os.getenv("SMART_SCRAPER_RUN_ID", "")
+API_URL = os.getenv(
+    "SMART_SCRAPER_API_URL",
+    ""
+).rstrip("/")
+
+INGEST_TOKEN = os.getenv(
+    "SMART_SCRAPER_INGEST_TOKEN",
+    ""
+)
+
+RUN_ID = os.getenv(
+    "SMART_SCRAPER_RUN_ID",
+    ""
+)
 
 DEFAULT_BATCH_SIZE = int(
-    os.getenv("SMART_SCRAPER_BATCH_SIZE", "100")
+    os.getenv(
+        "SMART_SCRAPER_BATCH_SIZE",
+        "100"
+    )
 )
 
 
@@ -20,6 +34,7 @@ def clean(value):
     if isinstance(value, str):
         value = value.strip()
         return value if value else None
+
     return value
 
 
@@ -37,7 +52,9 @@ def normalize_job(job):
     contact = job.get("contact") or {}
 
     return {
-        "source": clean(job.get("source")),
+        "source": clean(
+            job.get("source")
+        ),
 
         "source_job_id": clean(
             job.get("id")
@@ -49,7 +66,9 @@ def normalize_job(job):
             or job.get("title")
         ),
 
-        "role": clean(job.get("role")),
+        "role": clean(
+            job.get("role")
+        ),
 
         "job_description": clean(
             job.get("job_description")
@@ -61,14 +80,18 @@ def normalize_job(job):
             or job.get("url")
         ),
 
-        "company_id": clean(job.get("company_id")),
+        "company_id": clean(
+            job.get("company_id")
+        ),
 
         "company_name": clean(
             job.get("company_name")
             or job.get("company")
         ),
 
-        "company_slug": clean(job.get("company_slug")),
+        "company_slug": clean(
+            job.get("company_slug")
+        ),
 
         "company_website": clean(
             job.get("company_website")
@@ -84,14 +107,18 @@ def normalize_job(job):
             job.get("company_location")
         ),
 
-        "company_size": clean(job.get("company_size")),
+        "company_size": clean(
+            job.get("company_size")
+        ),
 
         "job_location": normalize_list(
             job.get("location")
             or job.get("job_location")
         ),
 
-        "remote": job.get("remote"),
+        "remote": job.get(
+            "remote"
+        ),
 
         "remote_type": clean(
             job.get("remote_type")
@@ -107,27 +134,41 @@ def normalize_job(job):
             or job.get("employment_type")
         ),
 
-        "experience_min": job.get("experience_min"),
+        "experience_min": job.get(
+            "experience_min"
+        ),
 
-        "experience_max": job.get("experience_max"),
+        "experience_max": job.get(
+            "experience_max"
+        ),
 
         "experience_text": clean(
             job.get("experience")
         ),
 
-        "skills": normalize_list(job.get("skills")),
+        "skills": normalize_list(
+            job.get("skills")
+        ),
 
-        "compensation": job.get("compensation"),
+        "compensation": job.get(
+            "compensation"
+        ),
 
-        "salary_min": job.get("salary_min"),
+        "salary_min": job.get(
+            "salary_min"
+        ),
 
-        "salary_max": job.get("salary_max"),
+        "salary_max": job.get(
+            "salary_max"
+        ),
 
         "salary_currency": clean(
             job.get("salary_currency")
         ),
 
-        "equity": job.get("equity"),
+        "equity": job.get(
+            "equity"
+        ),
 
         "visa_sponsorship": job.get(
             "visa_sponsorship"
@@ -139,15 +180,21 @@ def normalize_job(job):
 
         "hiring_contact": clean(
             job.get("hiring_contact")
-            or contact.get("hiring_contact")
+            or contact.get(
+                "hiring_contact"
+            )
         ),
 
         "hiring_manager": clean(
-            contact.get("hiring_manager")
+            contact.get(
+                "hiring_manager"
+            )
         ),
 
         "founders": normalize_list(
-            contact.get("founders")
+            contact.get(
+                "founders"
+            )
         ),
 
         "person_1_name": clean(
@@ -186,15 +233,39 @@ def load_jobs(input_file):
             f"Input file not found: {path}"
         )
 
-    with open(path, "r", encoding="utf-8") as f:
+    with open(
+        path,
+        "r",
+        encoding="utf-8"
+    ) as f:
         jobs = json.load(f)
 
     if not isinstance(jobs, list):
         raise ValueError(
-            "Input JSON must contain a list of jobs."
+            "Input JSON must contain "
+            "a list of jobs."
         )
 
     return jobs
+
+
+def get_endpoint():
+    if not API_URL:
+        raise RuntimeError(
+            "SMART_SCRAPER_API_URL "
+            "is missing"
+        )
+
+    if API_URL.endswith(
+        "ingest.php"
+    ):
+        return API_URL
+
+    return (
+        f"{API_URL}"
+        f"/api/v1/smart_scraper/"
+        f"ingest.php"
+    )
 
 
 def send_batch(
@@ -203,25 +274,26 @@ def send_batch(
     mode,
     source_name,
 ):
-    if not API_URL:
-        raise RuntimeError(
-            "SMART_SCRAPER_API_URL is missing"
-        )
-
     if not INGEST_TOKEN:
         raise RuntimeError(
-            "SMART_SCRAPER_INGEST_TOKEN is missing"
+            "SMART_SCRAPER_INGEST_TOKEN "
+            "is missing"
         )
 
-    endpoint = (
-        f"{API_URL}/api/v1/smart_scraper/ingest.php"
-    )
+    endpoint = get_endpoint()
 
     payload = {
-        "run_id": RUN_ID or None,
+        "run_id": (
+            RUN_ID
+            or None
+        ),
+
         "batch_number": batch_number,
+
         "mode": mode,
+
         "source": source_name,
+
         "jobs": [
             normalize_job(job)
             for job in batch
@@ -233,10 +305,15 @@ def send_batch(
         json=payload,
         headers={
             "Authorization": (
-                f"Bearer {INGEST_TOKEN}"
+                f"Bearer "
+                f"{INGEST_TOKEN}"
             ),
-            "Accept": "application/json",
-            "Content-Type": "application/json",
+            "Accept": (
+                "application/json"
+            ),
+            "Content-Type": (
+                "application/json"
+            ),
         },
         timeout=90,
     )
@@ -249,12 +326,30 @@ def send_batch(
         )
 
     try:
-        return response.json()
+        result = response.json()
+
     except Exception as exc:
         raise RuntimeError(
             "API returned invalid JSON: "
             f"{response.text}"
         ) from exc
+
+    if not isinstance(
+        result,
+        dict
+    ):
+        raise RuntimeError(
+            "API returned unexpected "
+            "JSON response."
+        )
+
+    if result.get("ok") is False:
+        raise RuntimeError(
+            f"API rejected batch: "
+            f"{result}"
+        )
+
+    return result
 
 
 def ingest_file(
@@ -263,7 +358,9 @@ def ingest_file(
     source_name,
     batch_size,
 ):
-    jobs = load_jobs(input_file)
+    jobs = load_jobs(
+        input_file
+    )
 
     print(
         f"Loaded {len(jobs)} jobs "
@@ -286,12 +383,15 @@ def ingest_file(
         batch_size,
     ):
         batch = jobs[
-            start:start + batch_size
+            start:
+            start + batch_size
         ]
 
         print(
-            f"Sending batch {batch_number} "
-            f"with {len(batch)} jobs..."
+            f"Sending batch "
+            f"{batch_number} "
+            f"with {len(batch)} "
+            f"jobs..."
         )
 
         result = send_batch(
@@ -301,32 +401,105 @@ def ingest_file(
             source_name=source_name,
         )
 
-        for key in totals:
-            totals[key] += int(
-                result.get(key, 0)
+        inserted = int(
+            result.get(
+                "new",
+                result.get(
+                    "inserted",
+                    0
+                )
             )
+        )
+
+        updated = int(
+            result.get(
+                "updated",
+                0
+            )
+        )
+
+        duplicates = int(
+            result.get(
+                "duplicates",
+                0
+            )
+        )
+
+        failed = int(
+            result.get(
+                "failed",
+                0
+            )
+        )
+
+        totals[
+            "received"
+        ] += len(batch)
+
+        totals[
+            "inserted"
+        ] += inserted
+
+        totals[
+            "updated"
+        ] += updated
+
+        totals[
+            "duplicates"
+        ] += duplicates
+
+        totals[
+            "failed"
+        ] += failed
 
         print(
             f"Batch {batch_number}: "
-            f"inserted={result.get('inserted', 0)} "
-            f"updated={result.get('updated', 0)} "
-            f"duplicates={result.get('duplicates', 0)} "
-            f"failed={result.get('failed', 0)}"
+            f"inserted={inserted} "
+            f"updated={updated} "
+            f"duplicates={duplicates} "
+            f"failed={failed}"
         )
+
+        if result.get(
+            "run_new_total"
+        ) is not None:
+
+            print(
+                "Run new total: "
+                f"{result.get('run_new_total')}"
+                f"/"
+                f"{result.get('target')}"
+            )
+
+        if result.get(
+            "target_reached"
+        ) is True:
+
+            print(
+                "Target reached."
+            )
 
         batch_number += 1
 
-    print("")
-    print("Ingestion finished")
+    print()
+    print(
+        "Ingestion finished"
+    )
 
-    for key, value in totals.items():
-        print(f"{key}: {value}")
+    for key, value in (
+        totals.items()
+    ):
+        print(
+            f"{key}: {value}"
+        )
 
     return totals
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = (
+        argparse.ArgumentParser()
+    )
 
     parser.add_argument(
         "--file",
@@ -350,7 +523,9 @@ def main():
     parser.add_argument(
         "--batch-size",
         type=int,
-        default=DEFAULT_BATCH_SIZE,
+        default=(
+            DEFAULT_BATCH_SIZE
+        ),
     )
 
     args = parser.parse_args()
