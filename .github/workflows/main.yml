@@ -1,15 +1,45 @@
-name: Scraper Pipeline
+name: smart_scraper Scraper Pipeline
 
 on:
   workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Unique run id"
+        required: true
+        default: "manual-test-1"
 
-  schedule:
-    # 14:00 UTC = 19:00 PKT (7:00 PM Pakistan)
-    - cron: "0 14 * * *"
+      target:
+        description: "Target new leads"
+        required: true
+        default: "5"
+
+      batch:
+        description: "Batch size"
+        required: true
+        default: "5"
+
+      max_runtime:
+        description: "Maximum runtime in minutes"
+        required: true
+        default: "10"
 
 jobs:
   run-scraper:
     runs-on: ubuntu-latest
+
+    env:
+      SMART_SCRAPER_API_URL: ${{ secrets.SMART_SCRAPER_API_URL }}
+      SMART_SCRAPER_INGEST_TOKEN: ${{ secrets.SMART_SCRAPER_INGEST_TOKEN }}
+
+      SMART_SCRAPER_RUN_ID: ${{ github.event.inputs.run_id }}
+      SMART_SCRAPER_TARGET: ${{ github.event.inputs.target }}
+      SMART_SCRAPER_BATCH_SIZE: ${{ github.event.inputs.batch }}
+      SMART_SCRAPER_MAX_RUNTIME: ${{ github.event.inputs.max_runtime }}
+
+      ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
+      ALGOLIA_API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
+      URL: ${{ secrets.URL }}
+      LINKEDIN_LI_AT: ${{ secrets.LINKEDIN_LI_AT }}
 
     steps:
       - name: Checkout repository
@@ -29,23 +59,10 @@ jobs:
         run: |
           playwright install --with-deps chromium
 
-      - name: Install Google Chrome for Selenium
+      - name: Install Google Chrome
         run: |
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
-          google-chrome --version
 
-      - name: Run scraper pipeline
-        env:
-          ALGOLIA_APP_ID: ${{ secrets.ALGOLIA_APP_ID }}
-          ALGOLIA_API_KEY: ${{ secrets.ALGOLIA_API_KEY }}
-          URL: ${{ secrets.URL }}
-          LINKEDIN_LI_AT: ${{ secrets.LINKEDIN_LI_AT }}
-
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_PORT: ${{ secrets.DB_PORT }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-
+      - name: Run smart_scraper
         run: python main.py
