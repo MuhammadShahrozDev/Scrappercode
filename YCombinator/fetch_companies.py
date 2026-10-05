@@ -1,193 +1,268 @@
 import json
-from patchright.sync_api import sync_playwright
+import re
+import requests
+from bs4 import BeautifulSoup
 from pathlib import Path
 
-# ==========================================================
-# Configuration
-# ==========================================================
-
 BASE_DIR = Path(__file__).resolve().parent
-
-PROFILE_DIR = BASE_DIR / "yc_profile"
 
 INPUT_FILE = BASE_DIR / "data" / "jobs_all.json"
 OUTPUT_FILE = BASE_DIR / "data" / "companies.json"
 
-COMPANY_URL = "https://www.workatastartup.com/companies/fetch"
+YC_BASE = "https://www.ycombinator.com"
 
-BATCH_SIZE = 100
+HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/154.0.0.0 Safari/537.36"
+    ),
+    "Accept-Language": "en-US,en;q=0.9",
+}
 
 
-# ==========================================================
-# Get Company IDs
-# ==========================================================
+def clean_text(value):
+    if not value:
+        return ""
 
-def get_company_ids():
-    """
-    Extract unique company IDs from jobs_all.json.
-    """
+    return re.sub(
+        r"\s+",
+        " ",
+        value
+    ).strip()
 
+
+def get_company_slugs():
     with open(
         INPUT_FILE,
         "r",
         encoding="utf-8"
     ) as f:
-
         jobs = json.load(f)
 
-    company_ids = set()
+    slugs = set()
 
     for job in jobs:
+        slug = job.get("company_slug")
 
-        company_id = job.get("company_id")
+        if slug:
+            slugs.add(slug)
 
-        if company_id is not None:
-            company_ids.add(company_id)
-
-    return sorted(company_ids)
+    return sorted(slugs)
 
 
-# ==========================================================
-# Fetch Companies
-# ==========================================================
+def fetch_company(slug):
+    url = f"{YC_BASE}/companies/{slug}"
 
-def fetch_companies(page, company_ids):
-    """
-    Fetch company information using the existing YC browser session.
-    """
+    response = requests.get(
+        url,
+        headers=HEADERS,
+        timeout=30
+    )
 
-    companies = []
+    response.raise_for_status()
 
-    total = len(company_ids)
+    soup = BeautifulSoup(
+        response.text,
+        "html.parser"
+    )
 
-    for start in range(0, total, BATCH_SIZE):
+    company_name = ""
 
-        batch = company_ids[
-            start:start + BATCH_SIZE
-        ]
+    h1 = soup.find("h1")
 
-        end = min(
-            start + BATCH_SIZE,
-            total
+    if h1:
+        company_name = clean_text(
+            h1.get_text(" ", strip=True)
         )
 
-        print(
-            f"Fetching companies "
-            f"{start + 1}-{end} of {total}"
+    if not company_name:
+        company_name = (
+            slug
+            .replace("-", " ")
+            .title()
         )
 
-        result = page.evaluate(
-            """
-            async ({ ids }) => {
+    company_website = None
 
-                const csrfToken = document
-                    .querySelector('meta[name="csrf-token"]')
-                    ?.getAttribute("content");
+    for link in soup.find_all(
+        "a",
+        href=True
+    ):
+        href = link.get("href", "")
 
-                const response = await fetch(
-                    "/companies/fetch",
-                    {
-                        method: "POST",
+        if not href.startswith("http"):
+            continue
 
-                        headers: {
-                            "Accept": "application/json",
-                            "Content-Type": "application/json",
-                            "X-Requested-With": "XMLHttpRequest",
-                            "X-CSRF-Token": csrfToken || ""
-                        },
+        if "ycombinator.com" in href:
+            continue
 
-                        credentials: "include",
+        if "linkedin.com" in href:
+            continue
 
-                        body: JSON.stringify({
-                            ids: ids
-                        })
-                    }
-                );
+        if "twitter.com" in href:
+            continue
 
-                return {
-                    status: response.status,
-                    text: await response.text(),
-                    csrfTokenFound: !!csrfToken
-                };
-            }
-            """,
-            {
-                "ids": batch
-            }
-        )
+        if "x.com" in href:
+            continue
 
-        if result["status"] != 200:
-
-            print()
-            print("REQUEST FAILED")
-            print("Status:", result["status"])
-            print("CSRF token found:", result["csrfTokenFound"])
-            print("Response:", result["text"])
-            print()
-
-            raise RuntimeError(
-                f"Company fetch failed: {result['status']}"
-            )
-
-        data = json.loads(result["text"])
-
-        batch_companies = data.get(
-            "companies",
-            []
-        )
-
-        companies.extend(batch_companies)
-
-        print(
-            f"Received {len(batch_companies)} companies"
-        )
-
-    return companies
-
-
-# ==========================================================
-# Clean Company Data
-# ==========================================================
-
-def clean_company(company):
-    """
-    Keep company website and founder details.
-    """
+        company_website = href
+        break
 
     founders = []
 
-    for founder in company.get("founders", []):
+    founder_section = None
 
-        founders.append({
-            "id": founder.get("id"),
-            "first_name": founder.get("first_name"),
-            "last_name": founder.get("last_name"),
-            "full_name": founder.get("full_name"),
-            "founder_bio": founder.get("founder_bio"),
-            "linkedin": founder.get("linkedin"),
-        })
+    for heading in soup.find_all(
+        ["h2", "h3"]
+    ):
+        heading_text = clean_text(
+            heading.get_text(
+                " ",
+                strip=True
+            )
+        ).lower()
+
+        if (
+            "founder" in heading_text
+            or
+            "active founders" in heading_text
+        ):
+            founder_section = heading
+            break
+
+    if founder_section:
+
+        parent = founder_section.parent
+
+        candidates = parent.find_all(
+            ["div", "li"]
+        )
+
+        seen_founders = set()
+
+        for candidate in candidates:
+
+            text = clean_text(
+                candidate.get_text(
+                    " ",
+                    strip=True
+                )
+            )
+
+            if "Founder" not in text:
+                continue
+
+            linkedin = None
+
+            linkedin_link = candidate.find(
+                "a",
+                href=re.compile(
+                    r"linkedin\.com"
+                )
+            )
+
+            if linkedin_link:
+                linkedin = linkedin_link.get(
+                    "href"
+                )
+
+            name = None
+
+            for tag in candidate.find_all(
+                ["h3", "h4", "p", "span"]
+            ):
+                value = clean_text(
+                    tag.get_text(
+                        " ",
+                        strip=True
+                    )
+                )
+
+                if not value:
+                    continue
+
+                if value.lower() in {
+                    "founder",
+                    "founder/ceo",
+                    "founder/cto",
+                    "co-founder",
+                }:
+                    continue
+
+                if len(value) > 80:
+                    continue
+
+                name = value
+                break
+
+            if not name:
+                continue
+
+            key = name.lower()
+
+            if key in seen_founders:
+                continue
+
+            seen_founders.add(key)
+
+            founders.append({
+                "full_name": name,
+                "linkedin": linkedin,
+            })
 
     return {
-        "company_id": company.get("id"),
-        "company_name": company.get("name"),
-        "company_website": company.get("website"),
+        "company_slug": slug,
+        "company_name": company_name,
+        "company_website": company_website,
         "founders": founders,
     }
 
 
-# ==========================================================
-# Save
-# ==========================================================
+def main():
 
-def save_companies(companies):
+    print()
+    print("=" * 60)
+    print("Extracting company slugs")
+    print("=" * 60)
+    print()
 
-    cleaned_companies = []
+    slugs = get_company_slugs()
 
-    for company in companies:
+    print(
+        f"Found {len(slugs)} unique companies."
+    )
 
-        cleaned_companies.append(
-            clean_company(company)
+    companies = []
+
+    for index, slug in enumerate(
+        slugs,
+        start=1
+    ):
+
+        print(
+            f"Fetching company "
+            f"{index}/{len(slugs)}: "
+            f"{slug}"
         )
+
+        try:
+
+            company = fetch_company(
+                slug
+            )
+
+            companies.append(
+                company
+            )
+
+        except Exception as exc:
+
+            print(
+                f"[!] Failed: "
+                f"{slug} "
+                f"({type(exc).__name__})"
+            )
 
     with open(
         OUTPUT_FILE,
@@ -196,80 +271,27 @@ def save_companies(companies):
     ) as f:
 
         json.dump(
-            cleaned_companies,
+            companies,
             f,
             indent=4,
             ensure_ascii=False
         )
 
-
-# ==========================================================
-# Main
-# ==========================================================
-
-if __name__ == "__main__":
-
     print()
     print("=" * 60)
-    print("Extracting company IDs")
+    print("Finished")
     print("=" * 60)
-    print()
-
-    company_ids = get_company_ids()
 
     print(
-        f"Found {len(company_ids)} unique companies."
+        f"Total companies: "
+        f"{len(companies)}"
     )
 
-    print()
-    print("=" * 60)
-    print("Opening YC browser")
-    print("=" * 60)
-    print()
+    print(
+        f"Saved to: "
+        f"{OUTPUT_FILE}"
+    )
 
-    with sync_playwright() as p:
 
-        browser = p.chromium.launch(
-            headless=True,
-            args=[
-                "--disable-blink-features=AutomationControlled",
-                "--disable-dev-shm-usage",
-                "--no-sandbox",
-            ],
-        )
-
-        context = browser.new_context(viewport=None, no_viewport=True)
-        page = context.new_page()
-
-        page.goto(
-            "https://www.workatastartup.com/"
-        )
-
-        print("YC browser opened.")
-        print()
-
-        companies = fetch_companies(
-            page,
-            company_ids
-        )
-
-        print()
-        print(
-            f"Total companies received: "
-            f"{len(companies)}"
-        )
-
-        save_companies(companies)
-
-        print()
-        print("=" * 60)
-        print("Finished")
-        print("=" * 60)
-        print()
-
-        print(
-            f"Saved to {OUTPUT_FILE}"
-        )
-
-        context.close()
-        browser.close()
+if __name__ == "__main__":
+    main()

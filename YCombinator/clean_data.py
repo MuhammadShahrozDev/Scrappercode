@@ -53,7 +53,7 @@ def main():
     # ==========================================================
 
     company_lookup = {
-        company["company_id"]: company
+        company["company_slug"]: company
         for company in companies
     }
 
@@ -91,9 +91,9 @@ def main():
         # Find company
         # ------------------------------------------------------
 
-        company_id = job.get("company_id")
+        company_slug = job.get("company_slug")
 
-        company = company_lookup.get(company_id)
+        company = company_lookup.get(company_slug)
 
 
         if company is None:
@@ -102,7 +102,7 @@ def main():
 
             print(
                 f"Company not found: "
-                f"{company_id} "
+                f"{company_slug} "
                 f"({job.get('company_name')})"
             )
 

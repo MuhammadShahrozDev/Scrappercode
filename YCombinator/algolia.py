@@ -1,310 +1,372 @@
 import json
 import os
-from datetime import datetime, timezone, timedelta
+import re
+import hashlib
+from datetime import datetime, timezone
+from pathlib import Path
+from urllib.parse import urljoin
 
 import requests
-from dotenv import load_dotenv
+from bs4 import BeautifulSoup
 
-
-from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
+SEARCHES_FILE = BASE_DIR / "searches.json"
 
-SEARCHES = BASE_DIR / "searches.json"
+OUTPUT_DIR = BASE_DIR / "data"
+FILTERED_DIR = OUTPUT_DIR / "jobs_filtered"
 
-# ==========================================================
-# Algolia Credentials
-# ==========================================================
-
-load_dotenv()
-
-ALGOLIA_APP_ID = os.getenv("ALGOLIA_APP_ID")
-ALGOLIA_API_KEY = os.getenv("ALGOLIA_API_KEY")
-URL = os.getenv("URL")
+YC_BASE = "https://www.ycombinator.com"
+YC_JOBS_URL = "https://www.ycombinator.com/jobs/role/all"
 
 HEADERS = {
-    "X-Algolia-Application-Id": ALGOLIA_APP_ID,
-    "X-Algolia-API-Key": ALGOLIA_API_KEY,
-    "Content-Type": "application/json",
-    "User-Agent": "Mozilla/5.0",
-    "Origin": "https://www.ycombinator.com",
-    "Referer": "https://www.ycombinator.com/",
+    "User-Agent": (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/154.0.0.0 Safari/537.36"
+    ),
+    "Accept-Language": "en-US,en;q=0.9",
 }
 
 
-def validate_algolia_credentials():
-    """Fail fast with a clear message when the Algolia config is missing or invalid."""
-    if not ALGOLIA_APP_ID or not ALGOLIA_API_KEY or not URL:
-        raise RuntimeError(
-            "Missing Algolia configuration. Set ALGOLIA_APP_ID, "
-            "ALGOLIA_API_KEY, and URL in YCombinator/.env"
-        )
+def load_searches():
+    with open(SEARCHES_FILE, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 
-# ==========================================================
-# Configuration
-# ==========================================================
+def stable_job_id(job_url):
+    match = re.search(r"/jobs/([^/?#]+)", job_url)
 
-# Collect jobs posted within the last N days.
-LOOKBACK_DAYS = 5
+    if match:
+        return match.group(1)
+
+    return hashlib.sha256(
+        job_url.encode("utf-8")
+    ).hexdigest()[:24]
 
 
-# ==========================================================
-# Time Helpers
-# ==========================================================
+def company_id_from_slug(slug):
+    return hashlib.sha256(
+        slug.encode("utf-8")
+    ).hexdigest()[:16]
 
-def within_lookback_period(job):
-    """
-    Returns True if the job is newer than LOOKBACK_DAYS.
-    """
 
-    created = datetime.fromisoformat(
-        job["created_at"].replace("Z", "+00:00")
+def clean_text(value):
+    if not value:
+        return ""
+
+    return re.sub(
+        r"\s+",
+        " ",
+        value
+    ).strip()
+
+
+def fetch_html(url):
+    response = requests.get(
+        url,
+        headers=HEADERS,
+        timeout=30,
     )
 
-    cutoff = datetime.now(timezone.utc) - timedelta(days=LOOKBACK_DAYS)
+    response.raise_for_status()
 
-    return created >= cutoff
+    return response.text
 
 
-# ==========================================================
-# Trim Old Jobs
-# ==========================================================
+def extract_company_slug(job_url):
+    match = re.search(
+        r"/companies/([^/]+)/jobs/",
+        job_url,
+    )
 
-def trim_old_jobs(hits):
-    """
-    Results are already sorted newest -> oldest.
+    if not match:
+        return ""
 
-    Instead of checking every job:
+    return match.group(1)
 
-        99
-        89
-        79
-        ...
 
-    we check every 10th job from the end until we find
-    one inside the lookback period, then scan only that
-    final block.
-    """
+def extract_description(job_url):
+    try:
+        html = fetch_html(job_url)
+    except Exception as exc:
+        print(
+            f"[!] Detail page failed: "
+            f"{job_url} ({type(exc).__name__})"
+        )
+        return ""
 
-    if not hits:
-        return hits
+    soup = BeautifulSoup(
+        html,
+        "html.parser",
+    )
 
-    # Entire page is within lookback.
-    if within_lookback_period(hits[-1]):
-        return hits
+    heading = None
 
-    block_start = 0
+    for tag in soup.find_all(
+        ["h1", "h2", "h3"]
+    ):
+        text = clean_text(
+            tag.get_text(" ", strip=True)
+        )
 
-    # Coarse search.
-    for i in range(len(hits) - 1, -1, -10):
-
-        if within_lookback_period(hits[i]):
-            block_start = i + 1
+        if text.lower() == "about the role":
+            heading = tag
             break
 
-    # Fine search.
-    cutoff = len(hits)
+    if heading is None:
+        return ""
 
-    for i in range(block_start, len(hits)):
+    parts = []
 
-        if not within_lookback_period(hits[i]):
-            cutoff = i
-            break
+    for node in heading.find_all_next():
 
-    return hits[:cutoff]
+        if node.name in {
+            "h1",
+            "h2",
+        }:
+            text = clean_text(
+                node.get_text(
+                    " ",
+                    strip=True,
+                )
+            )
+
+            if (
+                text
+                and text.lower()
+                != "about the role"
+            ):
+                break
+
+        if node.name in {
+            "p",
+            "li",
+            "h3",
+            "h4",
+        }:
+            text = clean_text(
+                node.get_text(
+                    " ",
+                    strip=True,
+                )
+            )
+
+            if text:
+                parts.append(text)
+
+    return "\n".join(parts).strip()
 
 
-# ==========================================================
-# Load Searches
-# ==========================================================
+def detect_role(card_text):
+    roles = [
+        "Engineering",
+        "Product",
+        "Design",
+        "Sales",
+        "Marketing",
+        "Operations",
+        "Recruiting",
+        "Science",
+        "Support",
+        "Finance",
+        "Legal",
+    ]
 
-with open(SEARCHES, "r", encoding="utf-8") as f:
-    SEARCHES = json.load(f)
+    lower = card_text.lower()
+
+    for role in roles:
+        if role.lower() in lower:
+            return role
+
+    return ""
 
 
-def search_jobs(search):
-    """
-    Executes one search from searches.json.
+def extract_jobs_from_page():
+    html = fetch_html(YC_JOBS_URL)
 
-    Stops automatically once jobs older than LOOKBACK_DAYS
-    are reached.
-    """
-
-    query = search.get("query", "")
-    role = search.get("role")
-    eng_type = search.get("eng_type")
-    design_type = search.get("design_type")
-    science_type = search.get("science_type")
-    recruiting_type = search.get("recruiting_type")
-    min_experience = search.get("min_experience")
-    remote = search.get("remote")
-    job_type = search.get("job_type")
-    has_equity = search.get("has_equity")
-    company_parent_sector = search.get("company_parent_sector")
-    us_visa_required = search.get("us_visa_required")
+    soup = BeautifulSoup(
+        html,
+        "html.parser",
+    )
 
     jobs = []
     seen = set()
-    page = 0
 
-    while True:
+    links = soup.find_all(
+        "a",
+        href=True,
+    )
 
-        # ---------------------------------------
-        # Build filters
-        # ---------------------------------------
+    for link in links:
 
-        filter_parts = []
+        href = link.get("href", "")
 
-        if role:
-            filter_parts.append(f"role:{role}")
+        if not re.search(
+            r"/companies/[^/]+/jobs/[^/]+",
+            href,
+        ):
+            continue
 
-        if eng_type:
-            filter_parts.append(f"eng_type:{eng_type}")
-
-        if design_type:
-            filter_parts.append(f"design_type:{design_type}")
-
-        if science_type:
-            filter_parts.append(f"science_type:{science_type}")
-
-        if recruiting_type:
-            filter_parts.append(f"recruiting_type:{recruiting_type}")
-
-        if min_experience is not None:
-            filter_parts.append(
-                f"min_experience:{min_experience}"
-            )
-
-        if remote:
-            filter_parts.append(
-                f'{"NOT " if remote.startswith("!") else ""}'
-                f'remote:"{remote.lstrip("!")}"'
-            )
-
-        if us_visa_required:
-            filter_parts.append(
-                f'{"NOT " if us_visa_required.startswith("!") else ""}'
-                f'us_visa_required:"{us_visa_required.lstrip("!")}"'
-            )
-
-        if job_type:
-            filter_parts.append(
-                f"job_type:{job_type}"
-            )
-
-        if has_equity is not None:
-            filter_parts.append(
-                f"has_equity:{has_equity}"
-            )
-
-        if company_parent_sector:
-            filter_parts.append(
-                f'{"NOT " if company_parent_sector.startswith("!") else ""}'
-                f'company_parent_sector:"{company_parent_sector.lstrip("!")}"'
-            )
-
-        filters = " AND ".join(filter_parts)
-
-        # ---------------------------------------
-        # Build request
-        # ---------------------------------------
-
-        params = (
-            f"query={query}"
-            f"&page={page}"
-            f"&filters={filters}"
-            "&attributesToRetrieve=%5B%22*%22%5D"
-            "&hitsPerPage=100"
-            "&distinct=false"
-            "&clickAnalytics=true"
+        job_url = urljoin(
+            YC_BASE,
+            href,
         )
 
-        payload = {
-            "requests": [
-                {
-                    "indexName":
-                        "WaaSPublicCompanyJob_created_at_desc_production",
-                    "params": params,
-                }
-            ]
+        if job_url in seen:
+            continue
+
+        title = clean_text(
+            link.get_text(
+                " ",
+                strip=True,
+            )
+        )
+
+        if not title:
+            continue
+
+        seen.add(job_url)
+
+        company_slug = extract_company_slug(
+            job_url
+        )
+
+        company_name = ""
+
+        parent = link.parent
+
+        for _ in range(6):
+
+            if parent is None:
+                break
+
+            parent_text = clean_text(
+                parent.get_text(
+                    " ",
+                    strip=True,
+                )
+            )
+
+            company_link = parent.find(
+                "a",
+                href=re.compile(
+                    rf"/companies/{re.escape(company_slug)}$"
+                ),
+            )
+
+            if company_link:
+                company_name = clean_text(
+                    company_link.get_text(
+                        " ",
+                        strip=True,
+                    )
+                )
+                card_text = parent_text
+                break
+
+            parent = parent.parent
+
+        else:
+            card_text = ""
+
+        if not company_name:
+            company_name = (
+                company_slug
+                .replace("-", " ")
+                .title()
+            )
+
+        role = detect_role(
+            card_text
+        )
+
+        description = extract_description(
+            job_url
+        )
+
+        job = {
+            "id": stable_job_id(
+                job_url
+            ),
+            "created_at": datetime.now(
+                timezone.utc
+            ).isoformat(),
+            "title": title,
+            "description": description,
+            "role": role,
+            "company_id": company_id_from_slug(
+                company_slug
+            ),
+            "company_slug": company_slug,
+            "company_name": company_name,
+            "search_path": job_url,
+            "objectID": stable_job_id(
+                job_url
+            ),
         }
 
-        try:
-            response = requests.post(
-                URL,
-                headers=HEADERS,
-                json=payload,
-                timeout=30,
-            )
-            response.raise_for_status()
-        except requests.HTTPError as exc:
-            if exc.response is not None and exc.response.status_code == 403:
-                print(
-                    "[!] Algolia rejected the configured Application ID or API key. "
-                    "Skipping this YC search. Update YCombinator/.env with valid credentials."
-                )
-                return []
-            raise
-
-        result = response.json()["results"][0]
-        hits = result["hits"]
-
-        if not hits:
-            break
-
-        if page == 0:
-            print(
-                f"Total matching jobs: {result['nbHits']}"
-            )
-            print()
-
-        print(
-            f"Page {page}: {len(hits)} jobs"
-        )
-
-        # ---------------------------------------
-        # Remove jobs outside lookback period
-        # ---------------------------------------
-
-        trimmed_hits = trim_old_jobs(hits)
-
-        for job in trimmed_hits:
-
-            if job["id"] in seen:
-                continue
-
-            seen.add(job["id"])
-            jobs.append(job)
-
-        # ---------------------------------------
-        # Stop once old jobs appear
-        # ---------------------------------------
-
-        if len(trimmed_hits) != len(hits):
-
-            print()
-            print(
-                f"Reached jobs older than "
-                f"{LOOKBACK_DAYS} day(s)."
-            )
-
-            break
-
-        page += 1
+        jobs.append(job)
 
     return jobs
 
 
+def matches_search(job, search):
+    query = clean_text(
+        search.get("query", "")
+    ).lower()
+
+    role = clean_text(
+        search.get("role", "")
+    ).lower()
+
+    title = clean_text(
+        job.get("title", "")
+    ).lower()
+
+    description = clean_text(
+        job.get("description", "")
+    ).lower()
+
+    job_role = clean_text(
+        job.get("role", "")
+    ).lower()
+
+    searchable = (
+        title
+        + " "
+        + description
+        + " "
+        + job_role
+    )
+
+    if query:
+        query_parts = [
+            item.strip()
+            for item in re.split(
+                r"[-_\s]+",
+                query,
+            )
+            if item.strip()
+        ]
+
+        if not all(
+            item in searchable
+            for item in query_parts
+        ):
+            return False
+
+    if role:
+        if (
+            role not in job_role
+            and role not in searchable
+        ):
+            return False
+
+    return True
+
+
 def save_jobs(jobs, filename):
-    """
-    Saves a flat list of jobs into the specified JSON file.
-
-    Existing data is preserved and new jobs are merged
-    while preventing duplicates. Older grouped output is
-    flattened when it is encountered.
-    """
-
     if os.path.exists(filename):
 
         with open(
@@ -312,46 +374,63 @@ def save_jobs(jobs, filename):
             "r",
             encoding="utf-8",
         ) as f:
-
-            data = json.load(f)
-
-
-        print(f"Loaded {filename}")
+            try:
+                data = json.load(f)
+            except Exception:
+                data = []
 
         if isinstance(data, dict):
             existing_jobs = []
 
             for block in data.values():
-                if not isinstance(block, dict):
+                if not isinstance(
+                    block,
+                    dict,
+                ):
                     continue
 
-                block_jobs = block.get("jobs", [])
+                block_jobs = block.get(
+                    "jobs",
+                    [],
+                )
 
-                if isinstance(block_jobs, list):
-                    existing_jobs.extend(block_jobs)
+                if isinstance(
+                    block_jobs,
+                    list,
+                ):
+                    existing_jobs.extend(
+                        block_jobs
+                    )
 
             data = existing_jobs
 
-        elif not isinstance(data, list):
+        elif not isinstance(
+            data,
+            list,
+        ):
             data = []
 
-
     else:
-
         data = []
 
     existing_ids = {
-        job["id"]
+        str(job.get("id"))
         for job in data
-        if isinstance(job, dict) and "id" in job
+        if isinstance(job, dict)
+        and job.get("id")
     }
 
     for job in jobs:
-        if job["id"] in existing_ids:
+
+        job_id = str(
+            job.get("id")
+        )
+
+        if job_id in existing_ids:
             continue
 
         data.append(job)
-        existing_ids.add(job["id"])
+        existing_ids.add(job_id)
 
     with open(
         filename,
@@ -367,68 +446,86 @@ def save_jobs(jobs, filename):
         )
 
 
-if __name__ == "__main__":
+def main():
+    os.makedirs(
+        OUTPUT_DIR,
+        exist_ok=True,
+    )
 
-    # Create output directory.
-    OUTPUT_DIR = BASE_DIR / "data"
-    FILTERED_DIR = OUTPUT_DIR / "jobs_filtered"
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    os.makedirs(FILTERED_DIR, exist_ok=True)
+    os.makedirs(
+        FILTERED_DIR,
+        exist_ok=True,
+    )
+
+    searches = load_searches()
+
+    print("=" * 60)
+    print("Fetching current YC jobs page")
+    print("=" * 60)
+
+    jobs = extract_jobs_from_page()
+
+    print(
+        f"Collected {len(jobs)} "
+        f"jobs from YC."
+    )
 
     all_jobs = []
     seen = set()
 
-    print()
+    for search in searches:
 
-    for search in SEARCHES:
-
+        print()
         print("=" * 60)
-        print(f"Running search: {search['name']}")
+        print(
+            f"Running search: "
+            f"{search['name']}"
+        )
         print("=" * 60)
-        print()
 
-        jobs = search_jobs(search)
+        filtered_jobs = [
+            job
+            for job in jobs
+            if matches_search(
+                job,
+                search,
+            )
+        ]
 
-        print()
-        print(f"Collected {len(jobs)} jobs.")
-        print()
+        print(
+            f"Collected "
+            f"{len(filtered_jobs)} jobs."
+        )
 
-        # --------------------------------------
-        # Save this filter's jobs
-        # --------------------------------------
-
-        filename = os.path.join(
-            FILTERED_DIR,
-            f"jobs_{search['name']}.json"
+        filename = (
+            FILTERED_DIR
+            / f"jobs_{search['name']}.json"
         )
 
         save_jobs(
-            jobs,
+            filtered_jobs,
             filename,
         )
 
-        print(f"Saved to {filename}")
-        print()
+        print(
+            f"Saved to {filename}"
+        )
 
-        # --------------------------------------
-        # Add to master list
-        # --------------------------------------
+        for job in filtered_jobs:
 
-        for job in jobs:
+            job_id = str(
+                job.get("id")
+            )
 
-            if job["id"] in seen:
+            if job_id in seen:
                 continue
 
-            seen.add(job["id"])
+            seen.add(job_id)
             all_jobs.append(job)
 
-    # --------------------------------------
-    # Save master file
-    # --------------------------------------
-
-    all_filename = os.path.join(
-        OUTPUT_DIR,
-        "jobs_all.json",
+    all_filename = (
+        OUTPUT_DIR
+        / "jobs_all.json"
     )
 
     save_jobs(
@@ -436,8 +533,21 @@ if __name__ == "__main__":
         all_filename,
     )
 
+    print()
     print("=" * 60)
     print("Finished")
     print("=" * 60)
-    print(f"Total unique jobs: {len(all_jobs)}")
-    print(f"Saved to {all_filename}")
+
+    print(
+        f"Total unique jobs: "
+        f"{len(all_jobs)}"
+    )
+
+    print(
+        f"Saved to "
+        f"{all_filename}"
+    )
+
+
+if __name__ == "__main__":
+    main()
