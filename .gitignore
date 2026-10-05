@@ -27,3 +27,8 @@ venv/
 
 YCombinator/yc_profile/
 Wellfound/wellfound_profile/
+
+YCombinator/data/jobs_all.json
+YCombinator/data/companies.json
+YCombinator/data/jobs_ycombinator.json
+YCombinator/data/jobs_filtered/*.json
