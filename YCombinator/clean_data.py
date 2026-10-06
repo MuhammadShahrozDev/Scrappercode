@@ -1,12 +1,22 @@
 import json
 from pathlib import Path
 
+
 BASE_DIR = Path(__file__).resolve().parent
-JOBS_FILE = BASE_DIR / "data" / "jobs_all.json"
-COMPANIES_FILE = BASE_DIR / "data" / "companies.json"
+
+JOBS_FILE = (
+    BASE_DIR
+    / "data"
+    / "jobs_all.json"
+)
+
+COMPANIES_FILE = (
+    BASE_DIR
+    / "data"
+    / "companies.json"
+)
 
 
-# Fields to remove from jobs
 DROP_FIELDS = {
     "_highlightResult",
     "_tags",
@@ -18,82 +28,81 @@ DROP_FIELDS = {
 
 def load_json(path):
 
-    with open(path, "r", encoding="utf-8") as f:
+    with open(
+        path,
+        "r",
+        encoding="utf-8"
+    ) as f:
+
         return json.load(f)
 
 
 def main():
 
-    # ==========================================================
-    # Load jobs
-    # ==========================================================
+    print(
+        f"Reading {JOBS_FILE}"
+    )
 
-    print(f"Reading {JOBS_FILE}")
+    jobs = load_json(
+        JOBS_FILE
+    )
 
-    jobs = load_json(JOBS_FILE)
-
-    print(f"Loaded {len(jobs)} jobs")
-
-
-    # ==========================================================
-    # Load companies
-    # ==========================================================
-
-    print(f"Reading {COMPANIES_FILE}")
-
-    companies = load_json(COMPANIES_FILE)
-
-    print(f"Loaded {len(companies)} companies")
+    print(
+        f"Loaded {len(jobs)} jobs"
+    )
 
 
-    # ==========================================================
-    # Create company lookup
-    #
-    # companies.json uses "company_id"
-    # ==========================================================
+    print(
+        f"Reading {COMPANIES_FILE}"
+    )
+
+    companies = load_json(
+        COMPANIES_FILE
+    )
+
+    print(
+        f"Loaded "
+        f"{len(companies)} companies"
+    )
+
 
     company_lookup = {
         company["company_slug"]: company
         for company in companies
+        if company.get(
+            "company_slug"
+        )
     }
 
-
-    # ==========================================================
-    # Clean and update jobs
-    # ==========================================================
 
     clean_jobs = []
 
     matched = 0
     unmatched = 0
 
-    for job in jobs:
 
-        # ------------------------------------------------------
-        # Remove unwanted fields
-        # ------------------------------------------------------
+    for job in jobs:
 
         clean_job = {
             key: value
-            for key, value in job.items()
+            for key, value
+            in job.items()
             if key not in DROP_FIELDS
         }
 
 
-        # ------------------------------------------------------
-        # Add source
-        # ------------------------------------------------------
-
-        clean_job["source"] = "ycombinator"
+        clean_job[
+            "source"
+        ] = "ycombinator"
 
 
-        # ------------------------------------------------------
-        # Find company
-        # ------------------------------------------------------
+        company_slug = job.get(
+            "company_slug"
+        )
 
-        company_slug = job.get("company_slug")
-
-        company = company_lookup.get(company_slug)
+        company = company_lookup.get(
+            company_slug
+        )
 
 
         if company is None:
@@ -110,50 +119,85 @@ def main():
 
             matched += 1
 
-            # --------------------------------------------------
-            # Company website
-            # --------------------------------------------------
 
-            clean_job["company_website"] = company.get(
+            clean_job[
+                "company_name"
+            ] = (
+                company.get(
+                    "company_name"
+                )
+                or job.get(
+                    "company_name"
+                )
+            )
+
+
+            clean_job[
+                "company_website"
+            ] = company.get(
                 "company_website"
             )
 
 
-            # --------------------------------------------------
-            # Founder details
-            #
-            # Only keep name + LinkedIn
-            # --------------------------------------------------
+            clean_job[
+                "company_linkedin"
+            ] = company.get(
+                "company_linkedin"
+            )
 
-            clean_job["founders"] = [
+
+            clean_job[
+                "company_location"
+            ] = company.get(
+                "company_location",
+                []
+            )
+
+
+            clean_job[
+                "company_size"
+            ] = company.get(
+                "company_size"
+            )
+
+
+            clean_job[
+                "founders"
+            ] = [
                 {
-                    "full_name": founder.get("full_name"),
-                    "linkedin": founder.get("linkedin"),
+                    "full_name": founder.get(
+                        "full_name"
+                    ),
+
+                    "linkedin": founder.get(
+                        "linkedin"
+                    ),
                 }
-                for founder in company.get("founders", [])
+
+                for founder
+                in company.get(
+                    "founders",
+                    []
+                )
             ]
 
 
-        # ------------------------------------------------------
-        # Add cleaned job
-        # ------------------------------------------------------
+        clean_jobs.append(
+            clean_job
+        )
 
-        clean_jobs.append(clean_job)
-
-
-    # ==========================================================
-    # Sort jobs newest -> oldest
-    # ==========================================================
 
     clean_jobs.sort(
-        key=lambda job: job.get("created_at", ""),
+        key=lambda job: (
+            job.get(
+                "created_at",
+                ""
+            )
+            or ""
+        ),
         reverse=True,
     )
 
-
-    # ==========================================================
-    # Save
-    # ==========================================================
 
     with open(
         JOBS_FILE,
@@ -169,19 +213,30 @@ def main():
         )
 
 
-    # ==========================================================
-    # Summary
-    # ==========================================================
-
     print()
     print("=" * 60)
     print("Finished")
     print("=" * 60)
 
-    print(f"Total jobs: {len(clean_jobs)}")
-    print(f"Companies matched: {matched}")
-    print(f"Companies unmatched: {unmatched}")
-    print(f"Saved to: {JOBS_FILE}")
+    print(
+        f"Total jobs: "
+        f"{len(clean_jobs)}"
+    )
+
+    print(
+        f"Companies matched: "
+        f"{matched}"
+    )
+
+    print(
+        f"Companies unmatched: "
+        f"{unmatched}"
+    )
+
+    print(
+        f"Saved to: "
+        f"{JOBS_FILE}"
+    )
 
 
 if __name__ == "__main__":
