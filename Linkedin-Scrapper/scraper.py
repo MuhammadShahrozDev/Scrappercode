@@ -44,6 +44,7 @@ class LinkedInIntelligenceScraper:
     with open(config_path, "r", encoding="utf-8") as f:
       self.config = json.load(f)
     self.target_output = int(os.getenv("TARGET_OUTPUT") or os.getenv("SMART_SCRAPER_TARGET", "5"))
+    self.fast_mode = os.getenv("LINKEDIN_FAST_MODE", "1").strip().lower() not in {"0", "false", "no"}
     self.driver = self._init_driver()
     self.today = date.today().strftime("%Y-%m-%d")
     print(f"[*] TARGET_OUTPUT loaded from env: {self.target_output}")
@@ -560,6 +561,9 @@ class LinkedInIntelligenceScraper:
           self.config.get("role_aliases", {}).keys()
       )
 
+      if self.fast_mode:
+          fallback_roles = fallback_roles[:1]
+
       # ---------------------------------------------------------
       # Helper for processing returned people
       # ---------------------------------------------------------
@@ -753,10 +757,11 @@ class LinkedInIntelligenceScraper:
                   ".org-people-profile-card, "
                   ".scaffold-finite-scroll__content, "
                   "main",
-                  timeout=12,
+                  timeout=5 if self.fast_mode else 12,
               )
 
-              BotEvasion.human_delay(2.0, 4.0)
+              if not self.fast_mode:
+                  BotEvasion.human_delay(2.0, 4.0)
 
               BotEvasion.simulate_human_scroll(
                   self.driver,
@@ -839,10 +844,11 @@ class LinkedInIntelligenceScraper:
                   ".org-people-profile-card, "
                   ".scaffold-finite-scroll__content, "
                   "main",
-                  timeout=12,
+                  timeout=5 if self.fast_mode else 12,
               )
 
-              BotEvasion.human_delay(2.0, 4.0)
+              if not self.fast_mode:
+                  BotEvasion.human_delay(2.0, 4.0)
 
               BotEvasion.simulate_human_scroll(
                   self.driver,
@@ -1016,7 +1022,19 @@ class LinkedInIntelligenceScraper:
               matched_linkedin_url = None
               linkedin_website = ""
 
-              if linkedin_urls:
+              if self.fast_mode and linkedin_urls:
+                  for candidate_url in linkedin_urls:
+                      candidate_url = _normalize_company_url(candidate_url)
+
+                      if candidate_url:
+                          matched_linkedin_url = candidate_url
+                          print(
+                              "    [fast-mode] Using provided LinkedIn "
+                              f"company URL: {matched_linkedin_url}"
+                          )
+                          break
+
+              if linkedin_urls and not matched_linkedin_url:
 
                 fallback_candidates = []
 
