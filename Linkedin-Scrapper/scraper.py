@@ -533,7 +533,7 @@ class LinkedInIntelligenceScraper:
 
       return False
 
-  def scrape_people(self, company_url, hiring_contact=None):
+  def scrape_people(self, company_url, company_name="", hiring_contact=None):
       """
       Search the verified company's LinkedIn People page.
 
@@ -897,6 +897,83 @@ class LinkedInIntelligenceScraper:
 
           return candidates
 
+      def search_global_people(search_term):
+          """
+          Fallback to LinkedIn's global people search when the
+          company People page does not expose result cards.
+          """
+
+          query_parts = [
+              str(search_term or "").strip(),
+              str(company_name or "").strip(),
+          ]
+
+          query = " ".join(
+              part
+              for part in query_parts
+              if part
+          ).strip()
+
+          if not query:
+              return []
+
+          search_url = (
+              "https://www.linkedin.com/search/results/people/"
+              f"?keywords={query.replace(' ', '%20')}"
+          )
+
+          try:
+              print(
+                  f"    [people-global] Searching: {query}"
+              )
+
+              self.driver.get(search_url)
+
+              self._wait_for(
+                  "div[role='listitem'], "
+                  ".reusable-search__result-container, "
+                  ".entity-result, main",
+                  timeout=5 if self.fast_mode else 12,
+              )
+
+              soup = self._soup()
+
+              cards = soup.select(
+                  "div[role='listitem'], "
+                  ".reusable-search__result-container, "
+                  ".entity-result, "
+                  "div[data-chameleon-result-urn]"
+              )
+
+              people = process_cards(
+                  cards,
+                  search_term
+              )
+
+              if not people:
+                  people = process_profile_links(
+                      soup,
+                      search_term
+                  )
+
+              if people:
+                  print(
+                      f"    [people-global] Found "
+                      f"{len(people)} candidate(s)"
+                  )
+              else:
+                  print(
+                      "    [people-global] No valid candidates"
+                  )
+
+              return people
+
+          except Exception as e:
+              print(
+                  f"    [!] Global people search error: {e}"
+              )
+              return []
+
       # =========================================================
       # STEP 1 — Hiring contact
       # =========================================================
@@ -949,6 +1026,11 @@ class LinkedInIntelligenceScraper:
               if not people:
                   people = process_profile_links(
                       soup,
+                      hiring_contact
+                  )
+
+              if not people:
+                  people = search_global_people(
                       hiring_contact
                   )
 
@@ -1049,6 +1131,11 @@ class LinkedInIntelligenceScraper:
               if not people:
                   people = process_profile_links(
                       soup,
+                      search_term
+                  )
+
+              if not people:
+                  people = search_global_people(
                       search_term
                   )
 
@@ -1406,6 +1493,7 @@ class LinkedInIntelligenceScraper:
               # --------------------------------------------------
               people = self.scrape_people(
                   matched_linkedin_url,
+                  company_name=company_name,
                   hiring_contact=hiring_contact
               )
 
