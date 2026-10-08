@@ -43,7 +43,7 @@ class LinkedInIntelligenceScraper:
   def __init__(self, config_path=CONFIG_FILE):
     with open(config_path, "r", encoding="utf-8") as f:
       self.config = json.load(f)
-    self.target_output = int(os.getenv("TARGET_OUTPUT", 100))
+    self.target_output = int(os.getenv("TARGET_OUTPUT") or os.getenv("SMART_SCRAPER_TARGET", "5"))
     self.driver = self._init_driver()
     self.today = date.today().strftime("%Y-%m-%d")
     print(f"[*] TARGET_OUTPUT loaded from env: {self.target_output}")
@@ -1018,6 +1018,20 @@ class LinkedInIntelligenceScraper:
 
               if linkedin_urls:
 
+                fallback_candidates = []
+
+                def _company_tokens(value):
+                    return {
+                        token
+                        for token in re.findall(
+                            r"[a-z0-9]+",
+                            (value or "").lower()
+                        )
+                        if len(token) >= 3
+                    }
+
+                company_tokens = _company_tokens(company_name)
+
                 for linkedin_url in linkedin_urls:
 
                     if not linkedin_url:
@@ -1031,9 +1045,45 @@ class LinkedInIntelligenceScraper:
                     )
 
                     if verification["website_match"]:
-                        matched_linkedin_url = linkedin_url
+                        matched_linkedin_url = _normalize_company_url(linkedin_url)
                         linkedin_website = verification["linkedin_website"]
                         break
+
+                    canonical_url = _normalize_company_url(linkedin_url)
+                    slug = self._company_slug(canonical_url) or ""
+                    slug_tokens = _company_tokens(
+                        slug.replace("-", " ")
+                    )
+
+                    overlap = company_tokens & slug_tokens
+
+                    if overlap:
+                        fallback_candidates.append(
+                            (
+                                len(overlap),
+                                canonical_url
+                            )
+                        )
+
+                if (
+                    not matched_linkedin_url
+                    and fallback_candidates
+                ):
+                    fallback_candidates.sort(
+                        key=lambda item: item[0],
+                        reverse=True
+                    )
+
+                    matched_linkedin_url = (
+                        fallback_candidates[0][1]
+                    )
+
+                    print(
+                        "    [fallback-accept] LinkedIn About page "
+                        "did not expose Website, but provided company "
+                        f"URL matches company name tokens: "
+                        f"{matched_linkedin_url}"
+                    )
 
 
               # --------------------------------------------------
