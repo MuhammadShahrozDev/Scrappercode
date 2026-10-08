@@ -8,6 +8,17 @@ on:
         required: true
         default: "manual-test-1"
 
+      source:
+        description: "Scraper source"
+        required: true
+        type: choice
+        options:
+          - all
+          - ycombinator
+          - linkedin
+          - wellfound
+        default: all
+
       target:
         description: "Target new leads"
         required: true
@@ -33,9 +44,10 @@ jobs:
       SMART_SCRAPER_INGEST_TOKEN: ${{ secrets.SMART_SCRAPER_INGEST_TOKEN }}
 
       SMART_SCRAPER_RUN_ID: ${{ github.event.inputs.run_id }}
+      SMART_SCRAPER_SOURCE: ${{ github.event.inputs.source }}
       SMART_SCRAPER_TARGET: ${{ github.event.inputs.target }}
       SMART_SCRAPER_BATCH_SIZE: ${{ github.event.inputs.batch }}
-      SMART_SCRAPER_MAX_RUNTIME: ${{ github.event.inputs.max_runtime }}
+      SMART_SCRAPER_MAX_RUNTIME_MINUTES: ${{ github.event.inputs.max_runtime }}
 
       LINKEDIN_LI_AT: ${{ secrets.LINKEDIN_LI_AT }}
 
