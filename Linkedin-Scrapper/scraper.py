@@ -732,6 +732,171 @@ class LinkedInIntelligenceScraper:
 
           return new_people
 
+      def process_profile_links(soup, search_term):
+          """
+          Fallback parser for newer LinkedIn layouts where the
+          old people-card CSS classes are missing but /in/ profile
+          anchors are still present in the rendered HTML.
+          """
+
+          candidates = []
+          seen_local = set()
+
+          for link in soup.select("a[href*='/in/']"):
+              href = (link.get("href") or "").strip()
+
+              if not href:
+                  continue
+
+              profile_url = (
+                  href
+                  if href.startswith("http")
+                  else f"https://www.linkedin.com{href}"
+              )
+
+              profile_url = (
+                  profile_url
+                  .split("?")[0]
+                  .split("#")[0]
+                  .rstrip("/")
+              )
+
+              if (
+                  "/in/" not in profile_url
+                  or profile_url in seen_profiles
+                  or profile_url in seen_local
+              ):
+                  continue
+
+              seen_local.add(profile_url)
+
+              name = (
+                  link.get("aria-label")
+                  or link.get("title")
+                  or link.get_text(" ", strip=True)
+                  or ""
+              ).strip()
+
+              container = link
+
+              for _ in range(4):
+                  if not container.parent:
+                      break
+
+                  container = container.parent
+
+                  text = container.get_text(
+                      " | ",
+                      strip=True
+                  )
+
+                  if len(text) >= 20:
+                      break
+
+              container_text = (
+                  container.get_text(
+                      " | ",
+                      strip=True
+                  )
+                  if container
+                  else ""
+              )
+
+              if not name:
+                  pieces = [
+                      piece.strip()
+                      for piece in container_text.split("|")
+                      if piece.strip()
+                  ]
+
+                  if pieces:
+                      name = pieces[0]
+
+              name = re.sub(
+                  r"\s+",
+                  " ",
+                  name
+              ).strip()
+
+              if (
+                  not name
+                  or name.lower() in {
+                      "linkedin member",
+                      "view profile",
+                      "profile",
+                  }
+              ):
+                  continue
+
+              title = ""
+
+              pieces = [
+                  piece.strip()
+                  for piece in container_text.split("|")
+                  if piece.strip()
+              ]
+
+              for piece in pieces:
+                  if piece == name:
+                      continue
+
+                  if len(piece) > 180:
+                      continue
+
+                  if self._classify_person_role(piece):
+                      title = piece
+                      break
+
+              if not title:
+                  for piece in pieces:
+                      if (
+                          piece != name
+                          and 2 < len(piece) <= 180
+                      ):
+                          title = piece
+                          break
+
+              actual_role = self._classify_person_role(
+                  title
+              )
+
+              if (
+                  hiring_contact
+                  and search_term == hiring_contact
+              ):
+                  if not self._names_match(
+                      hiring_contact,
+                      name
+                  ):
+                      continue
+              elif not actual_role:
+                  continue
+
+              candidates.append({
+                  "person_name": name,
+                  "person_role": title,
+                  "classified_role": (
+                      actual_role or ""
+                  ),
+                  "person_profile_url": profile_url,
+                  "search_term": search_term,
+              })
+
+              seen_profiles.add(profile_url)
+
+              if actual_role:
+                  discovered_roles.add(actual_role)
+
+              print(
+                  f"      [person-fallback] {name} — "
+                  f"{title or 'Unknown role'}"
+              )
+
+              if len(candidates) >= 2:
+                  break
+
+          return candidates
+
       # =========================================================
       # STEP 1 — Hiring contact
       # =========================================================
@@ -780,6 +945,12 @@ class LinkedInIntelligenceScraper:
                   cards,
                   hiring_contact
               )
+
+              if not people:
+                  people = process_profile_links(
+                      soup,
+                      hiring_contact
+                  )
 
               if people:
                   found.extend(people)
@@ -874,6 +1045,12 @@ class LinkedInIntelligenceScraper:
                   cards,
                   search_term
               )
+
+              if not people:
+                  people = process_profile_links(
+                      soup,
+                      search_term
+                  )
 
               found.extend(people)
 
