@@ -318,14 +318,14 @@ def run_linkedin(started_at, failures):
     if LINKEDIN_OUTPUT.exists():
         linkedin_ingest_ok = ingest_file(
             file_path=LINKEDIN_OUTPUT,
-            source="linkedin",
+            source="wellfound",
             mode="enrichment",
             started_at=started_at,
         )
 
         if not linkedin_ingest_ok:
             failures.append(
-                "LinkedIn enrichment ingestion"
+                "LinkedIn -> Wellfound enrichment ingestion"
             )
 
 
