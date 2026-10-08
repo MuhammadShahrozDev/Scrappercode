@@ -1,5 +1,6 @@
 import argparse
 import hashlib
+import html
 import re
 from urllib.parse import urlparse
 import json
@@ -100,7 +101,273 @@ def canonicalize_url(value):
     ).geturl()
 
 
+def plain_text(value):
+    value = str(value or "")
+
+    value = re.sub(
+        r"<[^>]+>",
+        " ",
+        value
+    )
+
+    value = html.unescape(value)
+
+    return re.sub(
+        r"\s+",
+        " ",
+        value
+    ).strip()
+
+
+def parse_money(value):
+    value = value.lower().replace(",", "").strip()
+
+    multiplier = 1
+
+    if value.endswith("k"):
+        multiplier = 1000
+        value = value[:-1]
+    elif value.endswith("m"):
+        multiplier = 1000000
+        value = value[:-1]
+
+    try:
+        return round(
+            float(value) * multiplier,
+            2
+        )
+    except Exception:
+        return None
+
+
+def infer_structured_fields(job):
+    text = plain_text(
+        job.get("job_description")
+        or job.get("description")
+    )
+
+    lower = text.lower()
+
+    inferred = {}
+
+    # Experience: only accept patterns explicitly tied to "experience".
+    exp_match = re.search(
+        r"\b(\d{1,2})(?:\s*[-–]\s*(\d{1,2}))?\+?\s+years?"
+        r"(?:\s+of)?\s+(?:relevant\s+|professional\s+|work\s+)?experience\b",
+        lower,
+    )
+
+    if exp_match:
+        inferred["experience_min"] = float(
+            exp_match.group(1)
+        )
+
+        if exp_match.group(2):
+            inferred["experience_max"] = float(
+                exp_match.group(2)
+            )
+
+        inferred["experience_text"] = (
+            exp_match.group(0)
+        )
+
+    # Salary: require an explicit compensation/salary context and a range.
+    salary_context = re.search(
+        r"(?:salary|compensation|base pay|base salary)"
+        r".{0,180}?"
+        r"(?:usd\s*)?\$\s*([0-9][0-9,.]*\s*[km]?)"
+        r"\s*(?:-|–|—|to)\s*"
+        r"(?:usd\s*)?\$\s*([0-9][0-9,.]*\s*[km]?)",
+        lower,
+    )
+
+    if not salary_context:
+        salary_context = re.search(
+            r"(?:usd\s*)?\$\s*([0-9][0-9,.]*\s*[km]?)"
+            r"\s*(?:-|–|—|to)\s*"
+            r"(?:usd\s*)?\$\s*([0-9][0-9,.]*\s*[km]?)"
+            r".{0,100}?(?:salary|compensation|base pay|base salary)",
+            lower,
+        )
+
+    if salary_context:
+        salary_min = parse_money(
+            salary_context.group(1)
+        )
+        salary_max = parse_money(
+            salary_context.group(2)
+        )
+
+        if (
+            salary_min
+            and salary_max
+            and salary_max >= salary_min
+            and salary_min >= 1000
+        ):
+            inferred["salary_min"] = salary_min
+            inferred["salary_max"] = salary_max
+            inferred["salary_currency"] = "USD"
+            inferred["compensation"] = {
+                "min": salary_min,
+                "max": salary_max,
+                "currency": "USD",
+                "inferred": True,
+            }
+
+    # Work arrangement.
+    if re.search(r"\bhybrid\b", lower):
+        inferred["remote_type"] = "hybrid"
+    elif re.search(
+        r"\b(?:fully\s+remote|remote-first|remote role|work remotely|100% remote)\b",
+        lower,
+    ):
+        inferred["remote_type"] = "remote"
+        inferred["remote"] = True
+    elif re.search(
+        r"\b(?:on-site|onsite|in-office|in office)\b",
+        lower,
+    ):
+        inferred["remote_type"] = "onsite"
+        inferred["remote"] = False
+
+    # Employment type.
+    employment_patterns = [
+        ("FULL_TIME", r"\b(?:full[- ]time|fulltime)\b"),
+        ("PART_TIME", r"\b(?:part[- ]time|parttime)\b"),
+        ("CONTRACT", r"\b(?:contract|contractor)\b"),
+        ("INTERNSHIP", r"\b(?:internship|intern)\b"),
+        ("TEMPORARY", r"\btemporary\b"),
+    ]
+
+    for employment_type, pattern in employment_patterns:
+        if re.search(pattern, lower):
+            inferred["job_type"] = employment_type
+            break
+
+    # Conservative skill extraction for matching.
+    skill_patterns = {
+        "Python": r"\bpython\b",
+        "JavaScript": r"\bjavascript\b|\bjs\b",
+        "TypeScript": r"\btypescript\b",
+        "React": r"\breact(?:\.js|js)?\b",
+        "Node.js": r"\bnode(?:\.js|js)?\b",
+        "PHP": r"\bphp\b",
+        "Laravel": r"\blaravel\b",
+        "Flutter": r"\bflutter\b",
+        "Dart": r"\bdart\b",
+        "Java": r"\bjava\b",
+        "Kotlin": r"\bkotlin\b",
+        "Swift": r"\bswift\b",
+        "AWS": r"\baws\b|amazon web services",
+        "Azure": r"\bazure\b",
+        "GCP": r"\bgcp\b|google cloud",
+        "Docker": r"\bdocker\b",
+        "Kubernetes": r"\bkubernetes\b|\bk8s\b",
+        "PostgreSQL": r"\bpostgres(?:ql)?\b",
+        "MySQL": r"\bmysql\b",
+        "MongoDB": r"\bmongodb\b",
+        "Redis": r"\bredis\b",
+        "SQL": r"\bsql\b",
+        "Machine Learning": r"\bmachine learning\b",
+        "AI": r"\bartificial intelligence\b|\bai\b",
+        "LLM": r"\bllms?\b|large language model",
+        "NLP": r"\bnlp\b|natural language processing",
+        "TensorFlow": r"\btensorflow\b",
+        "PyTorch": r"\bpytorch\b",
+        "Git": r"\bgit\b",
+        "REST API": r"\brest(?:ful)?\s+api\b|\brest\b",
+        "GraphQL": r"\bgraphql\b",
+    }
+
+    skills = []
+
+    for skill, pattern in skill_patterns.items():
+        if re.search(pattern, lower):
+            skills.append(skill)
+
+    if skills:
+        inferred["skills"] = skills
+
+    return inferred
+
+
+def apply_inferred_fields(job):
+    enriched = dict(job)
+    inferred = infer_structured_fields(enriched)
+
+    mapping = {
+        "experience_min": ["experience_min"],
+        "experience_max": ["experience_max"],
+        "experience_text": ["experience", "experience_text"],
+        "salary_min": ["salary_min"],
+        "salary_max": ["salary_max"],
+        "salary_currency": ["salary_currency"],
+        "compensation": ["compensation"],
+        "remote": ["remote"],
+        "remote_type": ["remote_type", "remote_status"],
+        "job_type": ["job_type", "employment_type"],
+        "skills": ["skills"],
+    }
+
+    inferred_used = []
+
+    for target, source_keys in mapping.items():
+        has_existing = any(
+            enriched.get(key) not in (
+                None,
+                "",
+                [],
+                {}
+            )
+            for key in source_keys
+        )
+
+        if has_existing:
+            continue
+
+        if target in inferred:
+            enriched[target] = inferred[target]
+            inferred_used.append(target)
+
+    quality_points = 0
+    quality_total = 10
+
+    for key in [
+        "job_title",
+        "title",
+        "job_description",
+        "description",
+        "job_url",
+        "url",
+        "company_name",
+        "company_website",
+        "company_linkedin",
+        "skills",
+    ]:
+        if enriched.get(key) not in (
+            None,
+            "",
+            [],
+            {}
+        ):
+            quality_points += 1
+
+    enriched["data_quality"] = {
+        "score": round(
+            min(
+                quality_points,
+                quality_total
+            ) / quality_total * 100
+        ),
+        "inferred_fields": inferred_used,
+        "method": "structured-source-plus-conservative-parser",
+    }
+
+    return enriched
+
+
 def normalize_job(job):
+    job = apply_inferred_fields(job)
     contact = job.get("contact") or {}
 
     return {
