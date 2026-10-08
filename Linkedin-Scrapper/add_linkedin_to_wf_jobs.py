@@ -1,17 +1,20 @@
+import hashlib
 import json
+import re
 from pathlib import Path
+from urllib.parse import urlparse
 
 BASE_DIR = Path(__file__).resolve().parent
 
-# wf/ is a sibling project; it now produces one combined file
-# instead of five per-role files.
-WF_INPUT_FILE = BASE_DIR.parent / "Wellfound" / "jobs" / "jobs_cleaned" / "jobs_all.json"
+WF_INPUT_FILE = (
+    BASE_DIR.parent
+    / "Wellfound"
+    / "jobs"
+    / "jobs_cleaned"
+    / "jobs_all.json"
+)
 
 PEOPLE_FILE = BASE_DIR / "output" / "people_links.json"
-
-# lin's own final output: Wellfound jobs enriched with LinkedIn
-# company + people data, ready for postprocessing to combine with
-# other sources. One file, not a per-role split.
 OUTPUT_FILE = BASE_DIR / "jobs" / "jobs_wellfound.json"
 
 
@@ -23,75 +26,173 @@ def load_people():
         str(company["company_id"]): company
         for company in people_data
         if company.get("company_id")
+        and company.get("linkedin_company_url")
     }
 
 
-def merge_people_into_jobs(jobs, people_by_company):
-    for job in jobs:
-        company_id = str(job.get("company_id", ""))
-        company_data = people_by_company.get(company_id)
+def stable_job_id(job):
+    existing = (
+        job.get("source_job_id")
+        or job.get("id")
+        or ""
+    )
 
-        if company_data:
-            job["linkedin_people"] = company_data.get("people", [])
-            job["company_linkedin"] = company_data.get("linkedin_company_url")
-        else:
-            job["linkedin_people"] = []
-            job["company_linkedin"] = None
+    if existing:
+        return str(existing).strip()
 
-    return jobs
+    url = (
+        job.get("job_url")
+        or job.get("url")
+        or ""
+    ).strip()
+
+    if url:
+        match = re.search(r"/jobs/(\d+)", url)
+        if match:
+            return match.group(1)
+
+        digest = hashlib.sha256(
+            url.encode("utf-8")
+        ).hexdigest()[:24]
+
+        return f"url-{digest}"
+
+    fingerprint = "|".join([
+        str(job.get("company_name") or "").strip().lower(),
+        str(job.get("title") or job.get("job_title") or "").strip().lower(),
+        str(job.get("location") or job.get("job_location") or "").strip().lower(),
+    ])
+
+    return "fp-" + hashlib.sha256(
+        fingerprint.encode("utf-8")
+    ).hexdigest()[:24]
 
 
-def job_to_row(job):
-    people = job.get("linkedin_people", [])
+def canonical_job_url(job):
+    url = (
+        job.get("job_url")
+        or job.get("url")
+        or ""
+    ).strip()
 
-    row = {
-        "source": job.get("source"),
-        "job_title": job.get("title"),
-        "job_description": job.get("description"),
-        "role": job.get("role"),
+    if not url:
+        return None
 
-        "company_name": job.get("company_name"),
-        "company_website": job.get("company_website"),
-        "company_linkedin": job.get("company_linkedin"),
+    parts = urlparse(url)
 
-        "hiring_contact": job.get("contact", {}).get("hiring_contact"),
-        "job_url": job.get("url")
-    }
+    return parts._replace(
+        query="",
+        fragment=""
+    ).geturl()
 
-    # Add each person exactly how it was structured for the spreadsheet
-    for i, person in enumerate(people, start=1):
-        row[f"person_{i}_name"] = person.get("person_name")
-        row[f"person_{i}_role"] = person.get("person_role")
-        row[f"person_{i}_profile_url"] = person.get("person_profile_url")
+
+def job_to_row(job, company_data):
+    row = dict(job)
+
+    row["source"] = "wellfound"
+    row["source_job_id"] = stable_job_id(job)
+    row["canonical_job_url"] = canonical_job_url(job)
+
+    if not row.get("job_title"):
+        row["job_title"] = row.get("title")
+
+    if not row.get("job_description"):
+        row["job_description"] = row.get("description")
+
+    if not row.get("job_url"):
+        row["job_url"] = row.get("url")
+
+    row["company_linkedin"] = company_data.get(
+        "linkedin_company_url"
+    )
+
+    people = company_data.get("people") or []
+
+    for i, person in enumerate(people[:2], start=1):
+        row[f"person_{i}_name"] = person.get(
+            "person_name"
+        )
+        row[f"person_{i}_role"] = person.get(
+            "person_role"
+        )
+        row[f"person_{i}_profile_url"] = person.get(
+            "person_profile_url"
+        )
+
+    if not row.get("hiring_contact"):
+        contact = row.get("contact") or {}
+        row["hiring_contact"] = (
+            contact.get("hiring_contact")
+            or company_data.get("hiring_contact")
+        )
+
+    row["linkedin_enriched"] = True
+    row["linkedin_company_verified"] = True
 
     return row
 
 
 def main():
     people_by_company = load_people()
-    print(f"Loaded {len(people_by_company)} companies from {PEOPLE_FILE}")
+
+    print(
+        f"Loaded {len(people_by_company)} enriched companies "
+        f"from {PEOPLE_FILE}"
+    )
 
     print(f"Reading: {WF_INPUT_FILE}")
 
     with open(WF_INPUT_FILE, "r", encoding="utf-8") as f:
         jobs = json.load(f)
 
-    print(f"Loaded {len(jobs)} jobs")
+    print(f"Loaded {len(jobs)} Wellfound jobs")
 
-    jobs = merge_people_into_jobs(jobs, people_by_company)
+    rows = []
 
-    rows = [job_to_row(job) for job in jobs]
+    for job in jobs:
+        company_id = str(
+            job.get("company_id") or ""
+        )
 
-    OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
+        company_data = people_by_company.get(
+            company_id
+        )
 
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump(rows, f, indent=2, ensure_ascii=False)
+        if not company_data:
+            continue
 
-    print("\n==============================")
+        rows.append(
+            job_to_row(
+                job,
+                company_data
+            )
+        )
+
+    OUTPUT_FILE.parent.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+    with open(
+        OUTPUT_FILE,
+        "w",
+        encoding="utf-8"
+    ) as f:
+        json.dump(
+            rows,
+            f,
+            indent=2,
+            ensure_ascii=False
+        )
+
+    print("")
+    print("==============================")
     print("DONE")
     print("==============================")
     print(f"Saved: {OUTPUT_FILE}")
-    print(f"Total jobs: {len(rows)}")
+    print(
+        f"LinkedIn-enriched jobs only: {len(rows)}"
+    )
 
 
 if __name__ == "__main__":
