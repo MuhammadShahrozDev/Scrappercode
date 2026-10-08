@@ -22,6 +22,26 @@ MAX_RUNTIME_MINUTES = int(
     )
 )
 
+SOURCE = os.getenv(
+    "SMART_SCRAPER_SOURCE",
+    "all"
+).strip().lower()
+
+VALID_SOURCES = {
+    "all",
+    "ycombinator",
+    "linkedin",
+    "wellfound",
+}
+
+if SOURCE not in VALID_SOURCES:
+    print(
+        f"[ERROR] Invalid SMART_SCRAPER_SOURCE: {SOURCE}. "
+        f"Allowed: {', '.join(sorted(VALID_SOURCES))}",
+        file=sys.stderr,
+    )
+    sys.exit(2)
+
 MAX_RUNTIME_SECONDS = (
     MAX_RUNTIME_MINUTES * 60
 )
@@ -85,6 +105,10 @@ def remaining_seconds(started_at):
 
 def time_exhausted(started_at):
     return remaining_seconds(started_at) <= 0
+
+
+def should_run(source_name):
+    return SOURCE == "all" or SOURCE == source_name
 
 
 def run_command(
@@ -203,33 +227,7 @@ def ingest_file(
     )
 
 
-def main():
-    started_at = time.monotonic()
-
-    print("")
-    print("=" * 70)
-    print("smart_scraper started")
-    print("=" * 70)
-
-    print(
-        f"Target new unique jobs: "
-        f"{TARGET_NEW}"
-    )
-
-    print(
-        f"Batch size: {BATCH_SIZE}"
-    )
-
-    print(
-        f"Maximum runtime: "
-        f"{MAX_RUNTIME_MINUTES} minutes"
-    )
-
-    failures = []
-
-    #
-    # 1. Y COMBINATOR
-    #
+def run_ycombinator(started_at, failures):
     yc_ok = run_python_script(
         script_path=YC_PIPELINE,
         started_at=started_at,
@@ -254,61 +252,128 @@ def main():
                 "Y Combinator ingestion"
             )
 
-    #
-    # 2. WELLFOUND
-    #
-    if not time_exhausted(started_at):
-        wf_ok = run_python_script(
-            script_path=WF_PIPELINE,
-            started_at=started_at,
-            label="Wellfound acquisition",
+
+def run_wellfound(started_at, failures):
+    if time_exhausted(started_at):
+        return
+
+    wf_ok = run_python_script(
+        script_path=WF_PIPELINE,
+        started_at=started_at,
+        label="Wellfound acquisition",
+    )
+
+    if not wf_ok:
+        failures.append(
+            "Wellfound acquisition"
         )
 
-        if not wf_ok:
-            failures.append(
-                "Wellfound acquisition"
-            )
-
-        if WF_OUTPUT.exists():
-            wf_ingest_ok = ingest_file(
-                file_path=WF_OUTPUT,
-                source="wellfound",
-                mode="acquisition",
-                started_at=started_at,
-            )
-
-            if not wf_ingest_ok:
-                failures.append(
-                    "Wellfound ingestion"
-                )
-
-    #
-    # 3. LINKEDIN ENRICHMENT
-    #
-    if not time_exhausted(started_at):
-        linkedin_ok = run_python_script(
-            script_path=LINKEDIN_PIPELINE,
+    if WF_OUTPUT.exists():
+        wf_ingest_ok = ingest_file(
+            file_path=WF_OUTPUT,
+            source="wellfound",
+            mode="acquisition",
             started_at=started_at,
-            label="LinkedIn enrichment",
         )
 
-        if not linkedin_ok:
+        if not wf_ingest_ok:
             failures.append(
-                "LinkedIn enrichment"
+                "Wellfound ingestion"
             )
 
-        if LINKEDIN_OUTPUT.exists():
-            linkedin_ingest_ok = ingest_file(
-                file_path=LINKEDIN_OUTPUT,
-                source="linkedin",
-                mode="enrichment",
-                started_at=started_at,
+
+def run_linkedin(started_at, failures):
+    if time_exhausted(started_at):
+        return
+
+    linkedin_input = (
+        BASE_DIR
+        / "Wellfound"
+        / "jobs"
+        / "jobs_cleaned"
+        / "jobs_all.json"
+    )
+
+    if not linkedin_input.exists():
+        print(
+            "[WARN] LinkedIn enrichment requires "
+            "Wellfound/jobs/jobs_cleaned/jobs_all.json."
+        )
+        failures.append(
+            "LinkedIn input data missing"
+        )
+        return
+
+    linkedin_ok = run_python_script(
+        script_path=LINKEDIN_PIPELINE,
+        started_at=started_at,
+        label="LinkedIn enrichment",
+    )
+
+    if not linkedin_ok:
+        failures.append(
+            "LinkedIn enrichment"
+        )
+
+    if LINKEDIN_OUTPUT.exists():
+        linkedin_ingest_ok = ingest_file(
+            file_path=LINKEDIN_OUTPUT,
+            source="linkedin",
+            mode="enrichment",
+            started_at=started_at,
+        )
+
+        if not linkedin_ingest_ok:
+            failures.append(
+                "LinkedIn enrichment ingestion"
             )
 
-            if not linkedin_ingest_ok:
-                failures.append(
-                    "LinkedIn enrichment ingestion"
-                )
+
+def main():
+    started_at = time.monotonic()
+
+    print("")
+    print("=" * 70)
+    print("smart_scraper started")
+    print("=" * 70)
+
+    print(
+        f"Source: {SOURCE}"
+    )
+
+    print(
+        f"Target new unique jobs: "
+        f"{TARGET_NEW}"
+    )
+
+    print(
+        f"Batch size: {BATCH_SIZE}"
+    )
+
+    print(
+        f"Maximum runtime: "
+        f"{MAX_RUNTIME_MINUTES} minutes"
+    )
+
+    failures = []
+
+    if should_run("ycombinator"):
+        run_ycombinator(
+            started_at,
+            failures,
+        )
+
+    if should_run("wellfound"):
+        run_wellfound(
+            started_at,
+            failures,
+        )
+
+    if should_run("linkedin"):
+        run_linkedin(
+            started_at,
+            failures,
+        )
 
     total_seconds = int(
         elapsed(started_at)
@@ -344,16 +409,10 @@ def main():
                 f" - {failure}"
             )
 
-        #
-        # Deliberately exit cleanly.
-        #
-        # Partial valid data may already
-        # have been saved successfully.
-        #
         sys.exit(0)
 
     print(
-        "All available stages "
+        "All selected stages "
         "completed successfully."
     )
 
