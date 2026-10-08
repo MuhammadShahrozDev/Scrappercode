@@ -1,4 +1,7 @@
 import argparse
+import hashlib
+import re
+from urllib.parse import urlparse
 import json
 import os
 import sys
@@ -48,6 +51,55 @@ def normalize_list(value):
     return [value]
 
 
+def derive_source_job_id(job):
+    existing = clean(
+        job.get("id")
+        or job.get("source_job_id")
+    )
+
+    if existing:
+        return existing
+
+    url = clean(
+        job.get("job_url")
+        or job.get("url")
+    )
+
+    if url:
+        match = re.search(r"/jobs/(\\d+)", url)
+
+        if match:
+            return match.group(1)
+
+        return "url-" + hashlib.sha256(
+            url.encode("utf-8")
+        ).hexdigest()[:24]
+
+    fingerprint = "|".join([
+        str(job.get("company_name") or job.get("company") or "").strip().lower(),
+        str(job.get("job_title") or job.get("title") or "").strip().lower(),
+        str(job.get("location") or job.get("job_location") or "").strip().lower(),
+    ])
+
+    return "fp-" + hashlib.sha256(
+        fingerprint.encode("utf-8")
+    ).hexdigest()[:24]
+
+
+def canonicalize_url(value):
+    value = clean(value)
+
+    if not value:
+        return None
+
+    parts = urlparse(value)
+
+    return parts._replace(
+        query="",
+        fragment=""
+    ).geturl()
+
+
 def normalize_job(job):
     contact = job.get("contact") or {}
 
@@ -56,10 +108,7 @@ def normalize_job(job):
             job.get("source")
         ),
 
-        "source_job_id": clean(
-            job.get("id")
-            or job.get("source_job_id")
-        ),
+        "source_job_id": derive_source_job_id(job),
 
         "job_title": clean(
             job.get("job_title")
@@ -77,6 +126,12 @@ def normalize_job(job):
 
         "job_url": clean(
             job.get("job_url")
+            or job.get("url")
+        ),
+
+        "canonical_job_url": canonicalize_url(
+            job.get("canonical_job_url")
+            or job.get("job_url")
             or job.get("url")
         ),
 
