@@ -1023,16 +1023,95 @@ class LinkedInIntelligenceScraper:
               linkedin_website = ""
 
               if self.fast_mode and linkedin_urls:
-                  for candidate_url in linkedin_urls:
-                      candidate_url = _normalize_company_url(candidate_url)
+                  def _compact_name(value):
+                      return re.sub(
+                          r"[^a-z0-9]+",
+                          "",
+                          (value or "").lower()
+                      )
 
-                      if candidate_url:
-                          matched_linkedin_url = candidate_url
-                          print(
-                              "    [fast-mode] Using provided LinkedIn "
-                              f"company URL: {matched_linkedin_url}"
+                  company_key = _compact_name(company_name)
+                  ranked_candidates = []
+
+                  for candidate_url in linkedin_urls:
+                      candidate_url = _normalize_company_url(
+                          candidate_url
+                      )
+
+                      if not candidate_url:
+                          continue
+
+                      slug = (
+                          self._company_slug(candidate_url)
+                          or ""
+                      )
+
+                      slug_key = _compact_name(
+                          slug.replace("-", " ")
+                      )
+
+                      score = 0
+
+                      if company_key and slug_key:
+                          if company_key == slug_key:
+                              score = 100
+                          elif (
+                              company_key in slug_key
+                              or slug_key in company_key
+                          ):
+                              score = 80
+                          else:
+                              company_tokens = {
+                                  token
+                                  for token in re.findall(
+                                      r"[a-z0-9]+",
+                                      company_name.lower()
+                                  )
+                                  if len(token) >= 3
+                              }
+
+                              slug_tokens = {
+                                  token
+                                  for token in re.findall(
+                                      r"[a-z0-9]+",
+                                      slug.replace("-", " ").lower()
+                                  )
+                                  if len(token) >= 3
+                              }
+
+                              score = 20 * len(
+                                  company_tokens
+                                  & slug_tokens
+                              )
+
+                      if score > 0:
+                          ranked_candidates.append(
+                              (
+                                  score,
+                                  candidate_url
+                              )
                           )
-                          break
+
+                  if ranked_candidates:
+                      ranked_candidates.sort(
+                          key=lambda item: item[0],
+                          reverse=True
+                      )
+
+                      matched_linkedin_url = (
+                          ranked_candidates[0][1]
+                      )
+
+                      print(
+                          "    [fast-mode] Using high-confidence "
+                          "provided LinkedIn company URL: "
+                          f"{matched_linkedin_url}"
+                      )
+                  else:
+                      print(
+                          "    [fast-mode] No high-confidence "
+                          "provided LinkedIn company URL."
+                      )
 
               if linkedin_urls and not matched_linkedin_url:
 
