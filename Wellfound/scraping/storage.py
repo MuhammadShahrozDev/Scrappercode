@@ -101,3 +101,32 @@ def mark_role_complete(role_id):
 
     with open(ROLES_FILE, "w", encoding="utf-8") as f:
         json.dump(sorted(completed), f, indent=4)
+
+def reset_run_state():
+    """Clear stale Wellfound artifacts before a fresh acquisition run."""
+    import shutil
+
+    for path in JOBS_DIR.glob("*.jsonl"):
+        path.unlink(missing_ok=True)
+
+    for path in JOBS_DIR.glob("jobs_*.json"):
+        path.unlink(missing_ok=True)
+
+    for path in [
+        JOBS_DIR / "jobs_all_raw.jsonl",
+        JOBS_DIR / "jobs_cleaned" / "jobs_all.json",
+    ]:
+        path.unlink(missing_ok=True)
+
+    for folder in [
+        JOBS_DIR / "jobs_with_website",
+        JOBS_DIR / "jobs_cleaned_linkedin",
+        JOBS_DIR / "jobs_with_company_linkedin",
+    ]:
+        if folder.exists():
+            shutil.rmtree(folder)
+
+    if ROLES_FILE.exists():
+        ROLES_FILE.unlink()
+
+    print("[*] Cleared stale Wellfound run artifacts.")
