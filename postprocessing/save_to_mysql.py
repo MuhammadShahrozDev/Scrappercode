@@ -190,7 +190,7 @@ def parse_compensation_range(value):
             currency = code_match.group(1).upper()
 
     number_pattern = (
-        r"([0-9]+(?:\.[0-9]+)?\s*"
+        r"([0-9][0-9,]*(?:\.[0-9]+)?\s*"
         r"(?:k|m|l|lac|lakh)?)"
     )
 
