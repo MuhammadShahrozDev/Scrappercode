@@ -1,3 +1,4 @@
+import os
 import random
 
 from browser import start_browser
