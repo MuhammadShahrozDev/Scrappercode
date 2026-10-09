@@ -170,7 +170,27 @@ def scrape_role(
             break
 
         cards = get_job_cards(page)
+
+        if not cards and recent_job_ids:
+            print(
+                "Search response has recent jobs but cards are not rendered yet; "
+                "waiting for the UI."
+            )
+
+            for _ in range(12):
+                page.wait_for_timeout(500)
+                cards = get_job_cards(page)
+
+                if cards:
+                    break
+
         print(f"Loaded {len(cards)} jobs")
+
+        if not cards and recent_job_ids:
+            raise RuntimeError(
+                "Wellfound returned recent jobs in GraphQL "
+                "but rendered 0 job cards."
+            )
 
         while processed < len(cards):
             if (
