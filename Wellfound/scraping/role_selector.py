@@ -1,43 +1,108 @@
 import random
 
+
+def _is_job_search_payload(payload):
+    try:
+        return bool(
+            payload.get("data", {})
+            .get("talent", {})
+            .get("jobSearchResults")
+        )
+    except Exception:
+        return False
+
+
 def select_role(page, role_name):
     page.keyboard.press("Escape")
     page.mouse.click(10, 10)
-    page.wait_for_timeout(500)
-
-    print("Role button count:",
-          page.locator('[data-test="SearchBar-RoleSelect-FocusButton"]').count())
+    page.wait_for_timeout(400)
 
     button = page.locator(
         '[data-test="SearchBar-RoleSelect-FocusButton"]'
     )
 
-    button.click()
-    page.wait_for_timeout(random.uniform(300, 600))
+    count = button.count()
+    print("Role button count:", count)
 
-    # Remove the currently selected role
-    page.keyboard.press("Backspace")
-    page.wait_for_timeout(random.uniform(200, 400))
+    if count < 1:
+        raise RuntimeError(
+            "Wellfound role selector button was not found."
+        )
 
-    # Type the new role
-    page.keyboard.type(
-        role_name,
-        delay=random.randint(30, 70),
-    )
+    responses = []
 
-    page.wait_for_timeout(random.uniform(400, 800))
+    def on_response(response):
+        if "/graphql" in response.url:
+            responses.append(response)
 
-    with page.expect_response(
-        lambda r: (
-            "/graphql" in r.url
-            and r.request.post_data
-            and '"operationName":"JobSearchResultsX"' in r.request.post_data
-        ),
-        timeout=30000,
-    ) as response_info:
+    page.on("response", on_response)
 
-        page.keyboard.press("Enter")
+    try:
+        button.click()
+        page.wait_for_timeout(
+            random.uniform(300, 600)
+        )
 
-    page.wait_for_timeout(random.uniform(800, 1500))
+        # Clear the current role/search text.
+        page.keyboard.press("Meta+A")
+        page.keyboard.press("Backspace")
+        page.wait_for_timeout(
+            random.uniform(200, 400)
+        )
 
-    return response_info.value.json()
+        page.keyboard.type(
+            role_name,
+            delay=random.randint(25, 60),
+        )
+
+        page.wait_for_timeout(
+            random.uniform(500, 900)
+        )
+
+        # Prefer an explicit matching option if Wellfound renders one.
+        option = page.get_by_text(
+            role_name,
+            exact=True
+        )
+
+        if option.count() > 0:
+            try:
+                option.last.click()
+            except Exception:
+                page.keyboard.press("Enter")
+        else:
+            page.keyboard.press("Enter")
+
+        # Give the UI/network time to emit the search request.
+        for _ in range(20):
+            page.wait_for_timeout(500)
+
+            for response in reversed(responses):
+                try:
+                    if response.status != 200:
+                        continue
+
+                    payload = response.json()
+
+                    if _is_job_search_payload(payload):
+                        print(
+                            "[*] Captured Wellfound job search response."
+                        )
+                        return payload
+
+                except Exception:
+                    continue
+
+        raise RuntimeError(
+            f"No Wellfound job-search GraphQL response "
+            f"captured for role '{role_name}'."
+        )
+
+    finally:
+        try:
+            page.remove_listener(
+                "response",
+                on_response
+            )
+        except Exception:
+            pass
