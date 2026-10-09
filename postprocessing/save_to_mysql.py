@@ -120,16 +120,32 @@ def plain_text(value):
 
 
 def parse_money(value):
-    value = value.lower().replace(",", "").strip()
+    value = (
+        str(value)
+        .lower()
+        .replace(",", "")
+        .strip()
+    )
 
     multiplier = 1
 
-    if value.endswith("k"):
-        multiplier = 1000
-        value = value[:-1]
-    elif value.endswith("m"):
-        multiplier = 1000000
-        value = value[:-1]
+    suffixes = {
+        "k": 1000,
+        "m": 1000000,
+        "l": 100000,
+        "lac": 100000,
+        "lakh": 100000,
+    }
+
+    for suffix, factor in sorted(
+        suffixes.items(),
+        key=lambda item: len(item[0]),
+        reverse=True,
+    ):
+        if value.endswith(suffix):
+            multiplier = factor
+            value = value[:-len(suffix)].strip()
+            break
 
     try:
         return round(
@@ -138,6 +154,117 @@ def parse_money(value):
         )
     except Exception:
         return None
+
+
+def parse_compensation_range(value):
+    if not isinstance(value, str):
+        return {}
+
+    text = value.strip()
+
+    currency_map = [
+        ("₹", "INR"),
+        ("₦", "NGN"),
+        ("$", "USD"),
+        ("£", "GBP"),
+        ("€", "EUR"),
+    ]
+
+    currency = None
+    symbol = None
+
+    for candidate_symbol, candidate_currency in currency_map:
+        if candidate_symbol in text:
+            symbol = candidate_symbol
+            currency = candidate_currency
+            break
+
+    if not currency:
+        code_match = re.search(
+            r"\b(USD|INR|NGN|GBP|EUR)\b",
+            text,
+            flags=re.IGNORECASE,
+        )
+
+        if code_match:
+            currency = code_match.group(1).upper()
+
+    number_pattern = (
+        r"([0-9]+(?:\.[0-9]+)?\s*"
+        r"(?:k|m|l|lac|lakh)?)"
+    )
+
+    if symbol:
+        pattern = (
+            re.escape(symbol)
+            + r"\s*"
+            + number_pattern
+            + r"\s*(?:-|–|—|to)\s*"
+            + re.escape(symbol)
+            + r"?\s*"
+            + number_pattern
+        )
+    else:
+        pattern = (
+            number_pattern
+            + r"\s*(?:-|–|—|to)\s*"
+            + number_pattern
+        )
+
+    match = re.search(
+        pattern,
+        text,
+        flags=re.IGNORECASE,
+    )
+
+    if not match:
+        return {}
+
+    salary_min = parse_money(match.group(1))
+    salary_max = parse_money(match.group(2))
+
+    if (
+        salary_min is None
+        or salary_max is None
+        or salary_max < salary_min
+    ):
+        return {}
+
+    return {
+        "salary_min": salary_min,
+        "salary_max": salary_max,
+        "salary_currency": currency,
+    }
+
+
+def normalize_remote_type(value):
+    value = clean(value)
+
+    if not value:
+        return None
+
+    normalized = re.sub(
+        r"[^a-z0-9]+",
+        "_",
+        value.lower(),
+    ).strip("_")
+
+    aliases = {
+        "remote": "remote",
+        "fully_remote": "remote",
+        "onsite": "onsite",
+        "on_site": "onsite",
+        "in_office": "onsite",
+        "hybrid": "hybrid",
+        "onsite_or_remote": "onsite_or_remote",
+        "on_site_or_remote": "onsite_or_remote",
+        "remote_or_onsite": "onsite_or_remote",
+    }
+
+    return aliases.get(
+        normalized,
+        normalized,
+    )
 
 
 def infer_structured_fields(job):
@@ -149,6 +276,38 @@ def infer_structured_fields(job):
     lower = text.lower()
 
     inferred = {}
+
+    source_experience_min = job.get("experience_min")
+    source_experience_max = job.get("experience_max")
+
+    if (
+        source_experience_min is not None
+        and job.get("experience_text") in (None, "")
+        and job.get("experience") in (None, "")
+    ):
+        try:
+            min_years = float(source_experience_min)
+
+            if source_experience_max is not None:
+                max_years = float(source_experience_max)
+                inferred["experience_text"] = (
+                    f"{min_years:g}-{max_years:g} years"
+                )
+            elif min_years > 0:
+                inferred["experience_text"] = (
+                    f"{min_years:g}+ years"
+                )
+            else:
+                inferred["experience_text"] = "0 years"
+        except Exception:
+            pass
+
+    compensation_fields = parse_compensation_range(
+        job.get("compensation")
+    )
+
+    for key, value in compensation_fields.items():
+        inferred[key] = value
 
     # Experience: only accept patterns explicitly tied to "experience".
     exp_match = re.search(
@@ -442,7 +601,7 @@ def normalize_job(job):
             "remote"
         ),
 
-        "remote_type": clean(
+        "remote_type": normalize_remote_type(
             job.get("remote_type")
             or job.get("remote_status")
         ),
@@ -465,7 +624,8 @@ def normalize_job(job):
         ),
 
         "experience_text": clean(
-            job.get("experience")
+            job.get("experience_text")
+            or job.get("experience")
         ),
 
         "skills": normalize_list(
