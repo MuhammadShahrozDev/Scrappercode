@@ -130,32 +130,40 @@ def main():
                 f"{role['title']} ====="
             )
 
-            search_results = select_role(
-                page,
-                role["title"],
-            )
+            try:
+                search_results = select_role(
+                    page,
+                    role["title"],
+                )
 
-            saved = scrape_role(
-                page,
-                role,
-                seen_job_ids,
-                search_results,
-                DAYS,
-                max_new_jobs=(
-                    TARGET_NEW - total_saved
-                ),
-            )
+                saved = scrape_role(
+                    page,
+                    role,
+                    seen_job_ids,
+                    search_results,
+                    DAYS,
+                    max_new_jobs=(
+                        TARGET_NEW - total_saved
+                    ),
+                )
 
-            total_saved += saved
+                total_saved += saved
 
-            mark_role_complete(
-                role["id"]
-            )
+                mark_role_complete(
+                    role["id"]
+                )
 
-            print(
-                f"Run total: "
-                f"{total_saved}/{TARGET_NEW}"
-            )
+                print(
+                    f"Run total: "
+                    f"{total_saved}/{TARGET_NEW}"
+                )
+
+            except Exception as exc:
+                print(
+                    f"[WARN] Role '{role['title']}' failed: "
+                    f"{exc}"
+                )
+                continue
 
         if total_saved <= 0:
             raise RuntimeError(
