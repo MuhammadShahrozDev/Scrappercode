@@ -4,6 +4,8 @@ import sys
 import time
 from pathlib import Path
 
+import requests
+
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -89,6 +91,49 @@ LINKEDIN_OUTPUT = (
     / "jobs"
     / "jobs_wellfound.json"
 )
+
+
+RUN_ID = os.getenv("SMART_SCRAPER_RUN_ID", "").strip()
+API_URL = os.getenv("SMART_SCRAPER_API_URL", "").rstrip("/")
+INGEST_TOKEN = os.getenv("SMART_SCRAPER_INGEST_TOKEN", "")
+
+
+def report_run_status(status, message, runtime_minutes):
+    if not RUN_ID or not API_URL or not INGEST_TOKEN:
+        return
+
+    if API_URL.endswith("ingest.php"):
+        endpoint = API_URL.rsplit("/", 1)[0] + "/run-status.php"
+    else:
+        endpoint = (
+            API_URL
+            + "/api/v1/smart_scraper/run-status.php"
+        )
+
+    try:
+        response = requests.post(
+            endpoint,
+            json={
+                "run_id": RUN_ID,
+                "source": SOURCE,
+                "status": status,
+                "message": message,
+                "runtime_minutes": runtime_minutes,
+            },
+            headers={
+                "Authorization": f"Bearer {INGEST_TOKEN}",
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+            },
+            timeout=30,
+        )
+        if not response.ok:
+            print(
+                f"[WARN] Run status callback failed "
+                f"HTTP {response.status_code}: {response.text}"
+            )
+    except Exception as exc:
+        print(f"[WARN] Run status callback failed: {exc}")
 
 
 def elapsed(started_at):
@@ -410,11 +455,26 @@ def main():
                 f" - {failure}"
             )
 
+        status = (
+            "timeout"
+            if time_exhausted(started_at)
+            else "failed"
+        )
+        report_run_status(
+            status,
+            "; ".join(failures),
+            total_minutes,
+        )
         sys.exit(1)
 
     print(
         "All selected stages "
         "completed successfully."
+    )
+    report_run_status(
+        "completed",
+        "All selected stages completed successfully.",
+        total_minutes,
     )
 
 
