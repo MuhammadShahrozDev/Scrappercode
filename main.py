@@ -79,7 +79,8 @@ WF_OUTPUT = (
     BASE_DIR
     / "Wellfound"
     / "jobs"
-    / "jobs_wellfound.json"
+    / "jobs_cleaned"
+    / "jobs_all.json"
 )
 
 LINKEDIN_OUTPUT = (
@@ -268,7 +269,7 @@ def run_wellfound(started_at, failures):
             "Wellfound acquisition"
         )
 
-    if WF_OUTPUT.exists():
+    if wf_ok and WF_OUTPUT.exists():
         wf_ingest_ok = ingest_file(
             file_path=WF_OUTPUT,
             source="wellfound",
@@ -409,7 +410,7 @@ def main():
                 f" - {failure}"
             )
 
-        sys.exit(0)
+        sys.exit(1)
 
     print(
         "All selected stages "
