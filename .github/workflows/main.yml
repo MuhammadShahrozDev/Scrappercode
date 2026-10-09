@@ -51,6 +51,7 @@ jobs:
 
       LINKEDIN_LI_AT: ${{ secrets.LINKEDIN_LI_AT }}
       LINKEDIN_FAST_MODE: "1"
+      WELLFOUND_STORAGE_STATE_B64: ${{ secrets.WELLFOUND_STORAGE_STATE_B64 }}
       PYTHONUNBUFFERED: "1"
 
     steps:
