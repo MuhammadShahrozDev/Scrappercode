@@ -130,38 +130,65 @@ def main():
                 f"{role['title']} ====="
             )
 
-            try:
-                search_results = select_role(
-                    page,
-                    role["title"],
-                )
+            role_error = None
 
-                saved = scrape_role(
-                    page,
-                    role,
-                    seen_job_ids,
-                    search_results,
-                    DAYS,
-                    max_new_jobs=(
-                        TARGET_NEW - total_saved
-                    ),
-                )
+            for attempt in range(1, 3):
+                try:
+                    if attempt > 1:
+                        print(
+                            f"[*] Retrying role '{role['title']}' "
+                            f"(attempt {attempt}/2)."
+                        )
 
-                total_saved += saved
+                        page.goto(
+                            "https://wellfound.com/jobs",
+                            wait_until="domcontentloaded",
+                            timeout=45000,
+                        )
 
-                mark_role_complete(
-                    role["id"]
-                )
+                        page.wait_for_timeout(1500)
 
+                    search_results = select_role(
+                        page,
+                        role["title"],
+                    )
+
+                    saved = scrape_role(
+                        page,
+                        role,
+                        seen_job_ids,
+                        search_results,
+                        DAYS,
+                        max_new_jobs=(
+                            TARGET_NEW - total_saved
+                        ),
+                    )
+
+                    total_saved += saved
+
+                    mark_role_complete(
+                        role["id"]
+                    )
+
+                    print(
+                        f"Run total: "
+                        f"{total_saved}/{TARGET_NEW}"
+                    )
+
+                    role_error = None
+                    break
+
+                except Exception as exc:
+                    role_error = exc
+                    print(
+                        f"[WARN] Role '{role['title']}' "
+                        f"attempt {attempt}/2 failed: {exc}"
+                    )
+
+            if role_error is not None:
                 print(
-                    f"Run total: "
-                    f"{total_saved}/{TARGET_NEW}"
-                )
-
-            except Exception as exc:
-                print(
-                    f"[WARN] Role '{role['title']}' failed: "
-                    f"{exc}"
+                    f"[WARN] Skipping role '{role['title']}' "
+                    f"after 2 failed attempts."
                 )
                 continue
 
