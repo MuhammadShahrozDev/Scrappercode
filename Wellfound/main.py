@@ -4,7 +4,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
-scripts = [
+SCRIPTS = [
     "scraping/start_scraping.py",
     "processing/clean_jobs.py",
     "processing/wellfound_company_websites_01.py",
@@ -14,22 +14,44 @@ scripts = [
     "processing/combine_and_cleanup.py",
 ]
 
-failures = []
+FINAL_OUTPUT = (
+    BASE_DIR
+    / "jobs"
+    / "jobs_cleaned"
+    / "jobs_all.json"
+)
 
-for script in scripts:
-    print(f"\n{'=' * 60}")
-    print(f"Running {script}")
-    print(f"{'=' * 60}\n")
 
-    result = subprocess.run(
-        [sys.executable, str(BASE_DIR / script)],
-    )
+def main():
+    for script in SCRIPTS:
+        print()
+        print("=" * 60)
+        print(f"Running {script}")
+        print("=" * 60)
+        print()
 
-    if result.returncode != 0:
-        print(f"[!] {script} failed with exit code {result.returncode}")
-        failures.append(script)
+        result = subprocess.run(
+            [sys.executable, str(BASE_DIR / script)],
+            cwd=str(BASE_DIR),
+        )
 
-if failures:
-    print(f"\n[!] Wellfound pipeline had {len(failures)} failed step(s): {', '.join(failures)}")
-else:
-    print("\nPipeline completed successfully.")
+        if result.returncode != 0:
+            print(
+                f"[ERROR] {script} failed "
+                f"with exit code {result.returncode}"
+            )
+            sys.exit(result.returncode or 1)
+
+    if not FINAL_OUTPUT.exists():
+        print(
+            "[ERROR] Wellfound pipeline completed "
+            "without fresh final output."
+        )
+        sys.exit(1)
+
+    print()
+    print("Pipeline completed successfully.")
+
+
+if __name__ == "__main__":
+    main()
