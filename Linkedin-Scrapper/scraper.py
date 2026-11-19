@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import time
 from datetime import date
 from pathlib import Path
 from urllib.parse import urlparse, urlunparse, parse_qs, urlencode, unquote
@@ -20,6 +21,13 @@ BASE_DIR = Path(__file__).resolve().parent
 CONFIG_FILE = str(BASE_DIR / "config.json")
 INPUT_FILE = str(BASE_DIR / "jobs" / "companies.json")
 OUTPUT_FILE = str(BASE_DIR / "output" / "people_links.json")
+NO_PEOPLE_FILE = str(BASE_DIR / "output" / "no_people_company_ids.json")
+
+# Stop cleanly when the orchestrator's time budget for this stage ends.
+DEADLINE_EPOCH = float(os.getenv("LINKEDIN_DEADLINE_EPOCH", "0") or 0)
+# If this many verified companies in a row return no people, the session is almost certainly
+# blocked (authwall/checkpoint); fail loudly instead of reporting a fake success.
+MAX_EMPTY_STREAK = int(os.getenv("LINKEDIN_MAX_EMPTY_STREAK", "15"))
 
 
 def _normalize_company_url(url):
@@ -70,16 +78,31 @@ class LinkedInIntelligenceScraper:
     print("[*] Injecting LinkedIn session cookie (li_at)...")
     driver.get("https://www.linkedin.com") # Must be on domain before adding cookies
     cookie_value = os.getenv("LINKEDIN_LI_AT")
-    if cookie_value:
-      driver.add_cookie({
-          "name": "li_at",
-          "value": cookie_value,
-          "domain": ".linkedin.com",
-          "path": "/"
-      })
-      driver.refresh() # Refresh to apply authenticated session state
-    else:
-      print("[!] WARNING: LINKEDIN_LI_AT not found in environment variables!")
+    if not cookie_value:
+      driver.quit()
+      raise RuntimeError("LINKEDIN_LI_AT is missing (set the GitHub secret or your .env).")
+
+    driver.add_cookie({
+        "name": "li_at",
+        "value": cookie_value,
+        "domain": ".linkedin.com",
+        "path": "/"
+    })
+    driver.refresh() # Refresh to apply authenticated session state
+    time.sleep(3)
+
+    # A logged-out browser is redirected away from /feed/. Without this check every
+    # search silently returns nothing and the run looks "successful" with zero people.
+    driver.get("https://www.linkedin.com/feed/")
+    time.sleep(3)
+    current_url = driver.current_url.lower()
+    if any(marker in current_url for marker in ("/login", "authwall", "checkpoint", "/uas/", "signup")):
+      driver.quit()
+      raise RuntimeError(
+          "LinkedIn session is not valid (li_at expired, or LinkedIn blocked this IP): "
+          f"{current_url}"
+      )
+    print("[*] LinkedIn session is logged in.")
 
     return driver
 
@@ -1174,6 +1197,19 @@ class LinkedInIntelligenceScraper:
     return []
 
 
+  def load_no_people_ids(self):
+    """Companies already tried in this workspace that returned no people (not retried)."""
+    try:
+      with open(NO_PEOPLE_FILE, "r", encoding="utf-8") as f:
+        return set(str(x) for x in json.load(f))
+    except Exception:
+      return set()
+
+  def save_no_people_ids(self, ids):
+    os.makedirs(os.path.dirname(NO_PEOPLE_FILE), exist_ok=True)
+    with open(NO_PEOPLE_FILE, "w", encoding="utf-8") as f:
+      json.dump(sorted(ids), f)
+
   def save_results(self, results):
       """Save results immediately to disk."""
       os.makedirs(
@@ -1252,9 +1288,16 @@ class LinkedInIntelligenceScraper:
       )
 
       new_successful = 0
+      empty_streak = 0
+      no_people_ids = self.load_no_people_ids()
+      self.failed = False
 
       try:
           for index, company in enumerate(companies, start=1):
+
+              if DEADLINE_EPOCH and time.time() >= DEADLINE_EPOCH:
+                  print("\n[time] LinkedIn stage time budget reached; stopping cleanly.")
+                  break
 
               company_name = company["company_name"]
 
@@ -1264,6 +1307,13 @@ class LinkedInIntelligenceScraper:
                   print(
                       f"\n[skip] {company_name} "
                       f"(already successfully processed)"
+                  )
+                  continue
+
+              if str(company_id) in no_people_ids:
+                  print(
+                      f"\n[skip] {company_name} "
+                      f"(no people found in an earlier pass)"
                   )
                   continue
               
@@ -1501,6 +1551,24 @@ class LinkedInIntelligenceScraper:
                   f"    [✓] Found {len(people)} people"
               )
 
+              if not people:
+                  # A company without any person is not a lead: don't save it or count it.
+                  no_people_ids.add(str(company_id))
+                  self.save_no_people_ids(no_people_ids)
+                  empty_streak += 1
+                  print(
+                      f"    [skip] No people for {company_name} "
+                      f"(empty streak {empty_streak}/{MAX_EMPTY_STREAK})"
+                  )
+                  if empty_streak >= MAX_EMPTY_STREAK:
+                      raise RuntimeError(
+                          f"{empty_streak} verified companies in a row returned no people; "
+                          "the LinkedIn session is probably blocked or its layout changed."
+                      )
+                  BotEvasion.random_action_delay()
+                  continue
+
+              empty_streak = 0
 
               result = {
                   "company_id": company["company_id"],
@@ -1533,9 +1601,11 @@ class LinkedInIntelligenceScraper:
           print("\n[!] Scraper interrupted by user.")
 
       except Exception as e:
+          self.failed = True
           print(f"\n[!] Workflow error: {e}")
 
       finally:
+          self.new_successful = new_successful
           if results:
               print(f"\n[+] Processed {len(results)} verified companies.")
           else:
@@ -1544,5 +1614,11 @@ class LinkedInIntelligenceScraper:
           print("[*] Scraper finished.")
 
 if __name__ == "__main__":
+  import sys
+
   scraper = LinkedInIntelligenceScraper()
   scraper.run_workflow()
+
+  # A hard failure with nothing new to show must not look like success.
+  if getattr(scraper, "failed", False) and not getattr(scraper, "new_successful", 0):
+    sys.exit(1)

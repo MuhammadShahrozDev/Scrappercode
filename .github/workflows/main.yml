@@ -17,27 +17,33 @@ on:
           - ycombinator
           - linkedin
           - wellfound
+          - upwork
         default: all
 
       target:
-        description: "Target new leads"
+        description: "Minimum leads PER SOURCE (all = 4 sources x this)"
         required: true
-        default: "5"
+        default: "50"
 
       batch:
         description: "Batch size"
         required: true
-        default: "5"
+        default: "100"
 
       max_runtime:
         description: "Maximum runtime in minutes"
         required: true
-        default: "10"
+        default: "240"
+
+      max_total:
+        description: "Maximum leads in one run/day (hard cap)"
+        required: false
+        default: "1000"
 
 jobs:
   run-scraper:
     runs-on: ubuntu-latest
-    timeout-minutes: 190
+    timeout-minutes: 350
 
     env:
       SMART_SCRAPER_API_URL: ${{ secrets.SMART_SCRAPER_API_URL }}
@@ -48,10 +54,18 @@ jobs:
       SMART_SCRAPER_TARGET: ${{ github.event.inputs.target }}
       SMART_SCRAPER_BATCH_SIZE: ${{ github.event.inputs.batch }}
       SMART_SCRAPER_MAX_RUNTIME_MINUTES: ${{ github.event.inputs.max_runtime }}
+      SMART_SCRAPER_MAX_TOTAL: ${{ github.event.inputs.max_total || '1000' }}
 
       LINKEDIN_LI_AT: ${{ secrets.LINKEDIN_LI_AT }}
       LINKEDIN_FAST_MODE: "1"
       WELLFOUND_STORAGE_STATE_B64: ${{ secrets.WELLFOUND_STORAGE_STATE_B64 }}
+
+      # Upwork source
+      UPWORK_STORAGE_STATE_B64: ${{ secrets.UPWORK_STORAGE_STATE_B64 }}
+      UPWORK_PROXY: ${{ secrets.UPWORK_PROXY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      UPWORK_QUERY: ${{ vars.UPWORK_QUERY || 'agentic ai' }}
+
       PYTHONUNBUFFERED: "1"
 
     steps:
@@ -62,21 +76,34 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            Upwork/requirements.txt
 
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Install Upwork dependencies (GLiNER, Gemini SDK)
+        if: ${{ github.event.inputs.source == 'all' || github.event.inputs.source == 'upwork' }}
+        run: |
+          pip install -r Upwork/requirements.txt
+
       - name: Install Playwright Chromium
         run: |
           playwright install --with-deps chromium
 
-      - name: Install Google Chrome
+      - name: Install virtual display (Chrome is preinstalled on ubuntu-latest)
         run: |
           sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
+          sudo apt-get install -y xvfb
+          google-chrome --version || {
+            wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+            sudo apt-get install -y ./google-chrome-stable_current_amd64.deb
+          }
           google-chrome --version
 
       - name: Run smart_scraper
-        run: python main.py
+        run: xvfb-run -a --server-args="-screen 0 1920x1080x24" python main.py

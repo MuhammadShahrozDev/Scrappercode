@@ -32,3 +32,10 @@ YCombinator/data/jobs_all.json
 YCombinator/data/companies.json
 YCombinator/data/jobs_ycombinator.json
 YCombinator/data/jobs_filtered/*.json
+# Upwork pipeline: scraped data, browser profile and the exported login session
+Upwork/data/
+Upwork/upwork_storage_state.b64.txt
+
+# Orchestrator scratch + LinkedIn output (regenerated each run; a stale committed copy hid failures)
+.smart_scraper_tmp/
+Linkedin-Scrapper/jobs/jobs_wellfound.json
