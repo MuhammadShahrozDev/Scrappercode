@@ -1,0 +1,8 @@
+
+patchright
+selenium
+beautifulsoup4
+python-dotenv
+google-genai
+gliner[onnx]
+ddgs

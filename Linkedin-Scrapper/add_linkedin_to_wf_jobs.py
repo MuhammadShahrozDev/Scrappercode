@@ -19,6 +19,10 @@ OUTPUT_FILE = BASE_DIR / "jobs" / "jobs_wellfound.json"
 
 
 def load_people():
+    if not PEOPLE_FILE.exists():
+        print(f"No people file at {PEOPLE_FILE}; nothing to enrich.")
+        return {}
+
     with open(PEOPLE_FILE, "r", encoding="utf-8") as f:
         people_data = json.load(f)
 
@@ -158,7 +162,7 @@ def main():
             company_id
         )
 
-        if not company_data:
+        if not company_data or not (company_data.get("people") or []):
             continue
 
         rows.append(

@@ -1010,15 +1010,34 @@ def main():
         ),
     )
 
+    parser.add_argument(
+        "--result-file",
+        default=None,
+        help=(
+            "Write the ingestion totals "
+            "(received/inserted/updated/"
+            "duplicates/failed) to this "
+            "JSON file."
+        ),
+    )
+
     args = parser.parse_args()
 
     try:
-        ingest_file(
+        totals = ingest_file(
             input_file=args.file,
             mode=args.mode,
             source_name=args.source,
             batch_size=args.batch_size,
         )
+
+        if args.result_file:
+            with open(
+                args.result_file,
+                "w",
+                encoding="utf-8",
+            ) as f:
+                json.dump(totals, f)
 
     except Exception as exc:
         print(
